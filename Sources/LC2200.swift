@@ -139,6 +139,10 @@ public struct LC2200Processor {
     private var currentAddress: UInt16 = 0x0000
     private var shouldRun = true
 
+    public mutating func setupMemory(words: [UInt16]) {
+        self.memory[0..<words.count] = words[0..<words.count]
+    }
+
     public mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
         registers[rx] = registers[ry] + registers[rz]
         currentAddress += 1
