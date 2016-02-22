@@ -1,3 +1,5 @@
+import Foundation
+
 public struct LC2200Processor {
     public typealias Register = RegisterFile.Register
     private var registers = RegisterFile()
