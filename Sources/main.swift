@@ -1,3 +1,3 @@
 var processor = LC2200Processor()
-processor.setupMemory([0x4603, 0xC7E0, 0xE000, 0x4805, 0xDE00])
+processor.setupMemory([0x4C0A, 0x4E1B, 0x12C7, 0xE000])
 processor.run()

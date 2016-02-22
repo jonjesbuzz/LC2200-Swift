@@ -1,5 +1,3 @@
-import Foundation
-
 public struct RegisterFile: CustomStringConvertible {
 
     var registers = [UInt16](count: 16, repeatedValue: 0)

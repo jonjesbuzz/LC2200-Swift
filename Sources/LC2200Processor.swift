@@ -1,5 +1,3 @@
-import Foundation
-
 public struct LC2200Processor {
     public typealias Register = RegisterFile.Register
     private var registers = RegisterFile()
@@ -12,7 +10,7 @@ public struct LC2200Processor {
     }
 
     public mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
-        registers[rx] = registers[ry] + registers[rz]
+        registers[rx] = UInt16(Int16(bitPattern: registers[ry]) + Int16(bitPattern: registers[rz]))
         currentAddress += 1
     }
 
@@ -22,7 +20,7 @@ public struct LC2200Processor {
     }
 
     public mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
-        registers[rx] = UInt16(Int16(registers[ry]) + Int16(offset))
+        registers[rx] = UInt16(bitPattern: Int16(registers[ry]) + Int16(offset))
         currentAddress += 1
     }
 
@@ -86,5 +84,6 @@ public struct LC2200Processor {
             print(instruction)
             executeInstruction(instruction)
         }
+        print(self.registers)
     }
 }
