@@ -18,7 +18,18 @@ public struct Instruction: CustomStringConvertible {
     }
 
     public var description: String {
-        return "Operation: \(self.operation), RegX: \(self.registerX), RegY: \(self.registerY), RegZ: \(self.registerZ), Offset: \(self.offset)"
+        switch operation.type {
+        case .Register:
+            return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)\tRegZ: \(self.registerZ)"
+        case .Immediate:
+            return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)\tOffset: \(self.offset)"
+        case .Jump:
+            return "Operation: \(self.operation)\tRegX: \(self.registerX)]\tRegY: \(self.registerY)"
+        case .SPop:
+            return "Operation: \(self.operation)\tControl Code: \(self.offset)"
+        case .None:
+            return "No-op / Illegal Instruction"
+        }
     }
     public struct Operation: OptionSetType, CustomStringConvertible {
         public enum OperationType {
@@ -29,16 +40,14 @@ public struct Instruction: CustomStringConvertible {
             case SPop
         }
         public let rawValue: UInt8
-        var type: OperationType = .None
+        var type: OperationType = .Immediate
         public init(rawValue: UInt8) {
             self.rawValue = rawValue
             if rawValue == 0b000 || rawValue == 0b001 {
                 self.type = .Register
-            } else if rawValue >= 0b010 && rawValue <= 0b101 {
-                self.type == .Immediate
             } else if rawValue == 0b110 {
                 self.type = .Jump
-            } else {
+            } else if rawValue == 0b111 {
                 self.type = .SPop
             }
         }
