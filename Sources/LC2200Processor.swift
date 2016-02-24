@@ -3,7 +3,7 @@ import Foundation
 public struct LC2200Processor {
     public typealias Register = RegisterFile.Register
     private var registers = RegisterFile()
-    private var memory = [UInt16](count: 16 * 1024, repeatedValue: 0)
+    private var memory = [UInt16](count: 64 * 1024, repeatedValue: 0)
     private var currentAddress: UInt16 = 0x0000
     private var shouldRun = true
 
@@ -20,7 +20,7 @@ public struct LC2200Processor {
     }
 
     public mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
-        registers[rx] = UInt16(bitPattern: Int16(registers[ry]) + Int16(offset))
+        registers[rx] = UInt16(bitPattern: Int16(bitPattern: registers[ry]) + Int16(offset))
     }
 
     public mutating func lw(rx: Register, _ ry: Register, offset: Int8) {

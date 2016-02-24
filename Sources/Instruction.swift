@@ -24,7 +24,7 @@ public struct Instruction: CustomStringConvertible {
         case .Immediate:
             return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)\tOffset: \(self.offset)"
         case .Jump:
-            return "Operation: \(self.operation)\tRegX: \(self.registerX)]\tRegY: \(self.registerY)"
+            return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)"
         case .SPop:
             return "Operation: \(self.operation)\tControl Code: \(self.offset)"
         case .None:
