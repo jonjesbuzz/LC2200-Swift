@@ -1,1 +1,5 @@
 .build
+Assembler/*.s
+Assembler/*.lc
+Assembler/*.sym
+

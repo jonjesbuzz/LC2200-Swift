@@ -13,39 +13,31 @@ public struct LC2200Processor {
 
     public mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
         registers[rx] = UInt16(Int16(bitPattern: registers[ry]) + Int16(bitPattern: registers[rz]))
-        currentAddress += 1
     }
 
     public mutating func nand(rx: Register, _ ry: Register, _ rz: Register) {
         registers[rx] = ~(registers[ry] & registers[rz])
-        currentAddress += 1
     }
 
     public mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
         registers[rx] = UInt16(bitPattern: Int16(registers[ry]) + Int16(offset))
-        currentAddress += 1
     }
 
     public mutating func lw(rx: Register, _ ry: Register, offset: Int8) {
         registers[rx] = memory[Int(registers[ry]) + Int(offset)]
-        currentAddress += 1
     }
 
     public mutating func sw(rx: Register, _ ry: Register, offset: Int8) {
         memory[Int(registers[ry]) + Int(offset)] = registers[rx]
-        currentAddress += 1
     }
 
     public mutating func beq(rx: Register, _ ry: Register, address: UInt16) {
         if registers[rx] == registers[ry] {
             currentAddress = address
-        } else {
-            currentAddress += 1
         }
     }
 
     public mutating func jalr(rx: Register, _ ry: Register = .ReturnAddr) {
-        currentAddress += 1
         registers[ry] = currentAddress
         currentAddress = registers[rx]
     }
@@ -57,6 +49,7 @@ public struct LC2200Processor {
     }
 
     public mutating func executeInstruction(instr: Instruction) {
+        currentAddress += 1
         switch instr.operation {
         case Instruction.Operation.Add:
             add(instr.registerX, instr.registerY, instr.registerZ)
@@ -69,7 +62,7 @@ public struct LC2200Processor {
         case Instruction.Operation.StoreWord:
             sw(instr.registerX, instr.registerY, offset: instr.offset)
         case Instruction.Operation.BranchEq:
-            beq(instr.registerX, instr.registerY, address: UInt16(Int16(currentAddress) + Int16(instr.offset)))
+            beq(instr.registerX, instr.registerY, address: UInt16(bitPattern: Int16(currentAddress) + Int16(instr.offset)))
         case Instruction.Operation.JumpAndLink:
             jalr(instr.registerX, instr.registerY)
         case Instruction.Operation.Spop:
