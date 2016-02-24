@@ -6,7 +6,7 @@ A 16-bit LC-2200 simulator.
 The simulator has two modes of operation (for now).
 
 * **Compiled**: The assembly is compiled into the binary.  This is the only supported method on Linux until the Foundation library is updated to work on Linux.  The `lcas-swift.pl` assembler will generate an array that can be inserted in `Program.swift`  After this, build the project and run the program without a filename.
-* **File**: On OS X, the `lcas-osx.pl` assembler can be used to generate a file that is then read by the front-end.  Linux support for this mode is yet implemented in mainline Swift.
+* **File**: The `lcas.pl` assembler can be used to generate a file that is then read by the front-end.
 
 This code was tested using the Feb 8 Development Snapshot of Swift on OS X.
 

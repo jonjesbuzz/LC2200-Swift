@@ -21,7 +21,6 @@ if (Process.arguments.count == 1 || (Process.arguments.count == 2 && Process.arg
     print("Loaded default/compiled program")
     processor.setupMemory(Program.program)
 } else {
-    // This only works on OS X until the Swift Foundation library is done.
     do {
         let memory = try String(contentsOfFile: Process.arguments[1], encoding: NSUTF8StringEncoding)
         let vals = memory.characters.split { $0 == " " || $0 == "\n" }.map(String.init)
