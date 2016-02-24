@@ -9,12 +9,11 @@ public struct Instruction: CustomStringConvertible {
         self.registerY = RegisterFile.Register(rawValue: regY)!
         let regZ = UInt8((value & 0x000F))
         self.registerZ = RegisterFile.Register(rawValue: regZ)!
-        if (value & 0x10 == 0b10000) {
+        if value & 0x10 == 0b10000 {
             self.offset = Int8(((~value & 0xF) + 1)) * -1
         } else {
             self.offset = Int8(value & 0xF)
         }
-
     }
 
     public var description: String {

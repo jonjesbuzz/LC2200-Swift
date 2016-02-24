@@ -37,7 +37,7 @@ public struct RegisterFile: CustomStringConvertible {
     public var description: String {
         var answer = ""
         for (i, v) in registers.enumerate() {
-            if (i < 13) {
+            if i < 13 {
                 answer += "\(Register(rawValue: UInt8(i))!):\t \(Int16(bitPattern: v))\n"
             } else {
                 answer += "\(Register(rawValue: UInt8(i))!):\t \(v)\n"

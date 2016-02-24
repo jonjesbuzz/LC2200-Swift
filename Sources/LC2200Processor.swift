@@ -81,4 +81,5 @@ public struct LC2200Processor {
         }
         print(self.registers)
     }
+
 }
