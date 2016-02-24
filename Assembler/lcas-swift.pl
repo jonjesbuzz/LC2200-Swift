@@ -261,13 +261,14 @@ while ($i < $high) {
     }
   } else {
     if(!(defined $word)) {
-      print $lcout "0000 ";
+      print $lcout "0x0000 ";
     } else {
       printf($lcout "0x%0.4X, ", $word);
     }
   }
   $i++;
 }
+print $lcout "0x0000";
 
 
 close ASM;

@@ -1,4 +1,4 @@
-public struct Instruction: CustomStringConvertible {
+public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible {
 
     public init(value: UInt16) {
         let opcode: UInt8 = UInt8((value & 0xE000) >> 13)
@@ -30,6 +30,22 @@ public struct Instruction: CustomStringConvertible {
             return "No-op / Illegal Instruction"
         }
     }
+
+    public var debugDescription: String {
+        switch operation.type {
+        case .Register:
+            return "\(self.operation) \(self.registerX), \(self.registerY), \(self.registerZ)"
+        case .Immediate:
+            return "\(self.operation) \(self.registerX), \(self.offset)(\(self.registerY))"
+        case .Jump:
+            return "\(self.operation) \(self.registerX), \(self.registerY)"
+        case .SPop:
+            return "\(self.operation) \(self.offset)"
+        case .None:
+            return "No-op / Illegal Instruction"
+        }
+    }
+
     public struct Operation: OptionSetType, CustomStringConvertible {
         public enum OperationType {
             case None

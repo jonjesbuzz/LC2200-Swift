@@ -2,7 +2,7 @@ public struct RegisterFile: CustomStringConvertible {
 
     var registers = [UInt16](count: 16, repeatedValue: 0)
 
-    public enum Register: UInt8 {
+    public enum Register: UInt8, CustomStringConvertible {
         case Zero = 0
         case AsmRsrv = 1
         case ReturnVal = 2
@@ -20,7 +20,43 @@ public struct RegisterFile: CustomStringConvertible {
         case FramePtr = 14
         case ReturnAddr = 15
 
+        public var description: String {
+            switch self {
+            case .Zero:
+                return "$zero"
+            case .AsmRsrv:
+                return "$at"
+            case .ReturnVal:
+                return "$v0"
+            case .Arg0:
+                return "$a0"
+            case .Arg1:
+                return "$a1"
+            case .Arg2:
+                return "$a2"
+            case .Temp0:
+                return "$t0"
+            case .Temp1:
+                return "$t1"
+            case .Temp2:
+                return "$t2"
+            case .Saved0:
+                return "$s0"
+            case .Saved1:
+                return "$s1"
+            case .Saved2:
+                return "$s2"
+            case .OSTrap:
+                return "$k0"
+            case .StackPtr:
+                return "$sp"
+            case .FramePtr:
+                return "$fp"
+            case .ReturnAddr:
+                return "$ra"
+        }
     }
+}
 
     public subscript(r: Register) -> UInt16 {
         get {

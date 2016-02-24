@@ -2,12 +2,16 @@ import Foundation
 
 public struct LC2200Processor {
     public typealias Register = RegisterFile.Register
-    private var registers = RegisterFile()
-    private var memory = [UInt16](count: 64 * 1024, repeatedValue: 0)
-    private var currentAddress: UInt16 = 0x0000
+    private(set) public var registers = RegisterFile()
+    private(set) public var memory = [UInt16](count: 64 * 1024, repeatedValue: 0)
+    private var originalMemory = [UInt16]()
+    private(set) public var currentAddress: UInt16 = 0x0000
     private var shouldRun = true
 
+    private var breakpoints = Set<UInt16>()
+
     public mutating func setupMemory(words: [UInt16]) {
+        self.originalMemory = words
         self.memory[0..<words.count] = words[0..<words.count]
     }
 
@@ -75,11 +79,52 @@ public struct LC2200Processor {
 
     public mutating func run() {
         while shouldRun {
-            let instruction = Instruction(value: memory[Int(currentAddress)])
-            print(instruction)
-            executeInstruction(instruction)
+            if breakpoints.contains(currentAddress) {
+                breakpoints.remove(currentAddress)
+                break
+            } else {
+                step()
+            }
         }
-        print(self.registers)
+    }
+
+    public mutating func setBreakpoint(location: UInt16) {
+        breakpoints.insert(location)
+    }
+
+    public mutating func reset() {
+        registers = RegisterFile()
+        currentAddress = 0
+        memory = [UInt16](count: 64 * 1024, repeatedValue: 0)
+        for (i, v) in originalMemory.enumerate() {
+            memory[i] = v
+        }
+        breakpoints = Set<UInt16>()
+        shouldRun = true
+    }
+
+    public mutating func step() {
+        if shouldRun {
+            let instruction = Instruction(value: memory[Int(currentAddress)])
+            print("0x\(String(currentAddress, radix: 16)):\t\(instruction)")
+            executeInstruction(instruction)
+        } else {
+            print("Execution halted")
+        }
+    }
+
+    public func stringForCurrentAddress() -> String {
+        return stringForAddress(Int(currentAddress))
+    }
+
+    public func stringForAddress(addr: Int) -> String {
+        let v = self.memory[addr]
+        return "0x\(String(addr, radix: 16).uppercaseString):\t\(stringForValue(v))"
+    }
+
+    public func stringForValue(v: UInt16) -> String {
+        let instr = Instruction(value: v)
+        return "\(v)\t0x\(String(v, radix: 16).uppercaseString)\t\(instr.debugDescription)"
     }
 
 }
