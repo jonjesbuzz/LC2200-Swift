@@ -76,7 +76,7 @@ public struct LC2200Processor {
             beq(instr.registerX, instr.registerY, address: UInt16(bitPattern: Int16(currentAddress) + Int16(instr.offset)))
         case Instruction.Operation.JumpAndLink:
             jalr(instr.registerX, instr.registerY)
-        case Instruction.Operation.Spop:
+        case Instruction.Operation.SPop:
             spop(0)
         default:
             print("Illegal operation. Treating as NOOP. Opcode: \(instr.operation.rawValue)")

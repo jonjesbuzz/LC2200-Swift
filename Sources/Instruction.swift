@@ -78,7 +78,7 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         public static let StoreWord = Operation(rawValue: 0b100, type: .Immediate)
         public static let BranchEq = Operation(rawValue: 0b101, type: .Immediate)
         public static let JumpAndLink = Operation(rawValue: 0b110, type: .Jump)
-        public static let Spop = Operation(rawValue: 0b111, type: .SPop)
+        public static let SPop = Operation(rawValue: 0b111, type: .SPop)
 
         public var description: String {
             switch self {
