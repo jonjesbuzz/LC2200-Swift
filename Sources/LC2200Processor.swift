@@ -106,7 +106,7 @@ public struct LC2200Processor {
     public mutating func step() {
         if shouldRun {
             let instruction = Instruction(value: memory[Int(currentAddress)])
-            print("0x\(String(currentAddress, radix: 16)):\t\(instruction)")
+            print("0x\(String(currentAddress, radix: 16).uppercaseString):\t\(instruction)")
             executeInstruction(instruction)
         } else {
             print("Execution halted")
