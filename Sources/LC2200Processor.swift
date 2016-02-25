@@ -1,5 +1,3 @@
-import Foundation
-
 public struct LC2200Processor {
     public typealias Register = RegisterFile.Register
     private(set) public var registers = RegisterFile()
@@ -81,8 +79,7 @@ public struct LC2200Processor {
         case Instruction.Operation.Spop:
             spop(0)
         default:
-            print("Illegal operation. Opcode: \(instr.operation.rawValue)")
-            abort()
+            print("Illegal operation. Treating as NOOP. Opcode: \(instr.operation.rawValue)")
         }
     }
 
