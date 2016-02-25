@@ -96,7 +96,7 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
                 return "BEQ"
             case Instruction.Operation.JumpAndLink:
                 return "JALR"
-            case Instruction.Operation.Spop:
+            case Instruction.Operation.SPop:
                 return "SPOP"
             default:
                 return "???"
