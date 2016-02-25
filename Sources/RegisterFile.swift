@@ -54,9 +54,48 @@ public struct RegisterFile: CustomStringConvertible {
                 return "$fp"
             case .ReturnAddr:
                 return "$ra"
+            }
+        }
+
+        init?(symbol: String) {
+            switch symbol {
+            case "$zero":
+                self = .Zero
+            case "$at":
+                self = .AsmRsrv
+            case "$v0":
+                self = .ReturnVal
+            case "$a0":
+                self = .Arg0
+            case "$a1":
+                self = .Arg1
+            case "$a2":
+                self = .Arg2
+            case "$t0":
+                self = .Temp0
+            case "$t1":
+                self = .Temp1
+            case "$t2":
+                self = .Temp2
+            case "$s0":
+                self = .Saved0
+            case "$s1":
+                self = .Saved1
+            case "$s2":
+                self = .Saved2
+            case "$k0":
+                self = .OSTrap
+            case "$sp":
+                self = .StackPtr
+            case "$fp":
+                self = .FramePtr
+            case "$ra":
+                self = .ReturnAddr
+            default:
+                return nil
+            }
         }
     }
-}
 
     public subscript(r: Register) -> UInt16 {
         get {

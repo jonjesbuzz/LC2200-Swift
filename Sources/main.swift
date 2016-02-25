@@ -86,8 +86,9 @@ if Process.arguments.contains("--debug") {
             } else {
                 start -= 5
             }
+            let end = (start + 10 < 16 * 1024) ? start + 10 :  16 * 1024
 
-            for i in start..<start + 10 {
+            for i in start..<end {
                 if (i == processor.currentAddress) {
                     print("-> ", separator: "", terminator: "")
                 }
@@ -96,8 +97,11 @@ if Process.arguments.contains("--debug") {
         case "print", "p":
             if let addr = UInt16(commandArg, radix: 16) {
                 print(processor.stringForAddress(Int(addr)))
+            } else if let register = RegisterFile.Register(symbol: commandArg) {
+                let regValue = processor.registers[register]
+                print(processor.stringForAddress(Int(regValue)))
             } else {
-                print("Invalid address: \(commandArg)")
+                print("Invalid address/register: \(commandArg)")
             }
         case "exit", "quit", "q":
             exit(0)
@@ -109,6 +113,7 @@ if Process.arguments.contains("--debug") {
             print("[r]un\t\t\tReset the processor and start the program.  All breakpoints are reset.")
             print("[l]ist\t\t\tPrint the current memory address, with 5 lines before and after.")
             print("[p]rint (0xFFFF)\tPrint the memory location.")
+            print("[p]rint ($reg)\tPrint the memory location of the value of a register.")
             print("[c]ontinue\t\tResume execution, after stopping/setting a breakpoint.")
             print("[br]eak (0xFFFF)\tAdd a breakpoint at a memory location.")
             print("[reg]ister\t\tPrint out the registers.")
