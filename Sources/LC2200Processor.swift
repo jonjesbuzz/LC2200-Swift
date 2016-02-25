@@ -38,7 +38,7 @@ public struct LC2200Processor {
     }
 
     public mutating func sw(rx: Register, _ ry: Register, offset: Int8) {
-        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
+        rewindStack.push(RewindInfo(value: memory[Int(registers[ry]) + Int(offset)], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
         memory[Int(registers[ry]) + Int(offset)] = registers[rx]
     }
 
