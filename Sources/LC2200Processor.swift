@@ -106,7 +106,7 @@ public struct LC2200Processor {
             memory[i] = v
         }
         breakpoints = Set<UInt16>()
-        rewindStack = Stack<RewindInfo>()
+        rewindStack.removeAll()
         shouldRun = true
     }
 
@@ -122,6 +122,7 @@ public struct LC2200Processor {
 
     public mutating func rewind() -> Bool {
         if let rewindInfo = rewindStack.pop() {
+            shouldRun = true
             self.currentAddress = rewindInfo.programCounter - 1
             if let oldRegister = rewindInfo.register {
                 registers[oldRegister] = rewindInfo.value
