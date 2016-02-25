@@ -10,38 +10,47 @@ public struct LC2200Processor {
 
     private var breakpoints = Set<UInt16>()
 
+    private var rewindStack = Stack<RewindInfo>()
+
     public mutating func setupMemory(words: [UInt16]) {
         self.originalMemory = words
         self.memory[0..<words.count] = words[0..<words.count]
     }
 
     public mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = UInt16(Int16(bitPattern: registers[ry]) + Int16(bitPattern: registers[rz]))
     }
 
     public mutating func nand(rx: Register, _ ry: Register, _ rz: Register) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = ~(registers[ry] & registers[rz])
     }
 
     public mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = UInt16(bitPattern: Int16(bitPattern: registers[ry]) + Int16(offset))
     }
 
     public mutating func lw(rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = memory[Int(registers[ry]) + Int(offset)]
     }
 
     public mutating func sw(rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
         memory[Int(registers[ry]) + Int(offset)] = registers[rx]
     }
 
     public mutating func beq(rx: Register, _ ry: Register, address: UInt16) {
+        rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         if registers[rx] == registers[ry] {
             currentAddress = address
         }
     }
 
     public mutating func jalr(rx: Register, _ ry: Register = .ReturnAddr) {
+        rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         registers[ry] = currentAddress
         currentAddress = registers[rx]
     }
@@ -100,6 +109,7 @@ public struct LC2200Processor {
             memory[i] = v
         }
         breakpoints = Set<UInt16>()
+        rewindStack = Stack<RewindInfo>()
         shouldRun = true
     }
 
@@ -111,6 +121,22 @@ public struct LC2200Processor {
         } else {
             print("Execution halted")
         }
+    }
+
+    public mutating func rewind() -> Bool {
+        if let rewindInfo = rewindStack.pop() {
+            self.currentAddress = rewindInfo.programCounter - 1
+            if let oldRegister = rewindInfo.register {
+                registers[oldRegister] = rewindInfo.value
+            }
+            if let oldMemoryAddress = rewindInfo.memoryAddress {
+                memory[oldMemoryAddress] = rewindInfo.value
+            }
+            let instruction = Instruction(value: memory[Int(currentAddress)])
+            print("0x\(String(currentAddress, radix: 16).uppercaseString):\t\(instruction)")
+            return true
+        }
+        return false
     }
 
     public func stringForCurrentAddress() -> String {

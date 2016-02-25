@@ -12,4 +12,12 @@ public struct Stack<E> {
         }
         return backing.removeLast()
     }
+
+    public var isEmpty: Bool {
+        return backing.isEmpty
+    }
+
+    public var count: Int {
+        return backing.count
+    }
 }

@@ -67,6 +67,10 @@ if Process.arguments.contains("--debug") {
             processor.step()
         case "continue", "cont", "c":
             processor.run()
+        case "back", "b":
+            if !processor.rewind() {
+                print("Nothing to rewind.")
+            }
         case "register", "reg":
             processor.printRegisters()
         case "reset":
@@ -111,6 +115,7 @@ if Process.arguments.contains("--debug") {
             print("Debug Mode")
             print()
             print("[r]un\t\t\tReset the processor and start the program.  All breakpoints are reset.")
+            print("[b]ack\t\t\tGo back 1 instruction.")
             print("[l]ist\t\t\tPrint the current memory address, with 5 lines before and after.")
             print("[p]rint (0xFFFF)\tPrint the memory location.")
             print("[p]rint ($reg)\tPrint the memory location of the value of a register.")
