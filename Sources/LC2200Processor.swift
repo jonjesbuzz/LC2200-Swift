@@ -85,11 +85,9 @@ public struct LC2200Processor {
 
     public mutating func run() {
         while shouldRun {
+            step()
             if breakpoints.contains(currentAddress) {
-                breakpoints.remove(currentAddress)
                 break
-            } else {
-                step()
             }
         }
     }
