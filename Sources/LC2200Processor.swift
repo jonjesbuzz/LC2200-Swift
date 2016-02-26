@@ -96,6 +96,10 @@ public struct LC2200Processor {
         breakpoints.insert(location)
     }
 
+    public mutating func removeBreakpoint(location: UInt16) {
+        breakpoints.remove(location)
+    }
+
     public mutating func reset() {
         registers = RegisterFile()
         currentAddress = 0
@@ -106,6 +110,10 @@ public struct LC2200Processor {
         breakpoints = Set<UInt16>()
         rewindStack.removeAll()
         shouldRun = true
+    }
+    
+    public func hasBreakpointAtAddress(address: UInt16) -> Bool {
+        return breakpoints.contains(address)
     }
 
     public mutating func step() {
