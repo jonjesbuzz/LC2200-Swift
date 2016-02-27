@@ -2,6 +2,10 @@ public struct RegisterFile: CustomStringConvertible {
 
     var registers = [UInt16](count: 16, repeatedValue: 0)
 
+    public var count: Int {
+        return registers.count
+    }
+
     public enum Register: UInt8, CustomStringConvertible {
         case Zero = 0
         case AsmRsrv = 1
@@ -106,6 +110,21 @@ public struct RegisterFile: CustomStringConvertible {
                 return
             }
             registers[Int(r.rawValue)] = newValue
+        }
+    }
+
+    public subscript(r: Int) -> UInt16 {
+        get {
+            if (r >= count) {
+                return 0
+            }
+            return registers[r]
+        }
+        set(newValue) {
+            if r == 0 || r >= count {
+                return
+            }
+            registers[r] = newValue
         }
     }
 
