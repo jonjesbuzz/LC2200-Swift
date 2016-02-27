@@ -1,4 +1,9 @@
 public struct LC2200Processor {
+
+    public init() {
+
+    }
+
     public typealias Register = RegisterFile.Register
     private(set) public var registers = RegisterFile()
     private(set) public var memory = [UInt16](count: 64 * 1024, repeatedValue: 0)
@@ -111,7 +116,7 @@ public struct LC2200Processor {
         rewindStack.removeAll()
         shouldRun = true
     }
-    
+
     public func hasBreakpointAtAddress(address: UInt16) -> Bool {
         return breakpoints.contains(address)
     }
