@@ -1,6 +1,7 @@
 import Foundation
 
 extension LC2200Processor {
+
     public func printRegisters() {
         print(self.registers)
     }
@@ -8,11 +9,12 @@ extension LC2200Processor {
     public func printMemory() {
         print("Mem\tDec\tHex\tInstr")
         for (i, v) in memory.enumerate() {
-            if (v != 0) {
-                print(stringForAddress(i));
+            if v != 0 {
+                print(stringForAddress(i))
             }
         }
     }
+
 }
 
 public struct CommandLineUI {
@@ -25,7 +27,7 @@ public struct CommandLineUI {
     }
 
     private mutating func initializeProcessor() {
-        if (arguments.count == 1 || (arguments.count == 2 && arguments[1] == "--debug")) {
+        if arguments.count == 1 || (arguments.count == 2 && arguments[1] == "--debug") {
             print("Loaded default/compiled program")
             processor.setupMemory(Program.program)
         } else {
@@ -105,15 +107,15 @@ public struct CommandLineUI {
                 }
             case "list", "l":
                 var start = processor.currentAddress
-                if (start <= 5) {
+                if start <= 5 {
                     start -= start
                 } else {
                     start -= 5
                 }
-                let end = (start + 10 < 16 * 1024) ? start + 10 :  16 * 1024
+                let end = (start + 10 < 16 * 1024) ? start + 10 : 16 * 1024
 
                 for i in start..<end {
-                    if (i == processor.currentAddress) {
+                    if i == processor.currentAddress {
                         print("-> ", separator: "", terminator: "")
                     }
                     print("\t\(processor.stringForAddress(Int(i)))")
@@ -151,5 +153,5 @@ public struct CommandLineUI {
             }
         }
     }
-}
 
+}

@@ -115,7 +115,7 @@ public struct RegisterFile: CustomStringConvertible {
 
     public subscript(r: Int) -> UInt16 {
         get {
-            if (r >= count) {
+            if r >= count {
                 return 0
             }
             return registers[r]
