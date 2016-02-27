@@ -17,7 +17,7 @@ extension LC2200Processor {
 
 public struct CommandLineUI {
 
-    private var processor = LC2200Processor()
+    private var processor = LC2200Processor(shouldPrint: true)
     private var arguments: [String]
     public init(arguments: [String]) {
         self.arguments = arguments
