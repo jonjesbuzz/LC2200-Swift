@@ -1,5 +1,7 @@
 # LC-2200 Simulator (Swift)
 
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+
 A 16-bit LC-2200 simulator.
 
 ## Usage
@@ -24,7 +26,10 @@ Running the simulator with `--debug` will enable a GDB-like debugger.
 `help` will print out usage information.
 
 ## Tests
-These need to be written at some point. :|
+These need to be written at some point. `:|`
+
+## Framework
+This simulator can also be compiled as a framework for iOS, OS X, tvOS (LOL), and watchOS (LOLOLOL).  Use [Carthage](https://github.com/Carthage/Carthage) to install the framework into your project.
 
 ## Documentation
 
