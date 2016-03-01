@@ -17,7 +17,7 @@ public struct LC2200Processor {
 
     private var rewindStack = Stack<RewindInfo>()
 
-    private mutating func setupMemory(words: [UInt16]) {
+    public mutating func setupMemory(words: [UInt16]) {
         self.originalMemory = words
         self.memory[0..<words.count] = words[0..<words.count]
     }

@@ -1,4 +1,4 @@
-internal struct Instruction: CustomStringConvertible, CustomDebugStringConvertible {
+public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible {
 
     internal init(value: UInt16) {
         let opcode: UInt8 = UInt8((value & 0xE000) >> 13)
@@ -66,7 +66,7 @@ internal struct Instruction: CustomStringConvertible, CustomDebugStringConvertib
         return instruction
     }
 
-    internal var description: String {
+    public var description: String {
         switch operation.type {
         case .Register:
             return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)\tRegZ: \(self.registerZ)"
@@ -81,7 +81,7 @@ internal struct Instruction: CustomStringConvertible, CustomDebugStringConvertib
         }
     }
 
-    internal var debugDescription: String {
+    public var debugDescription: String {
         switch operation.type {
         case .Register:
             return "\(self.operation) \(self.registerX), \(self.registerY), \(self.registerZ)"
