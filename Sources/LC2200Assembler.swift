@@ -19,6 +19,7 @@ public struct LC2200Assembler {
     private func preprocess() -> [String] {
         return source.characters.split { $0 == "\n" }.map(String.init)
     }
+
     private mutating func processCommentsAndLabels(inout lines: [String]) {
         for (index, line) in lines.enumerate() {
             let comment = line.componentsSeparatedByCharactersInSet(LanguageMap.commentCharacterSet)
@@ -28,7 +29,7 @@ public struct LC2200Assembler {
         }
         lines = lines.map { $0.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) }.filter { $0 != "" }
         var index = 0
-        while (index < lines.count) {
+        while index < lines.count {
             let line = lines[index]
             let labeledLine = line.componentsSeparatedByCharactersInSet(LanguageMap.labelCharacterSet)
             if labeledLine.count > 2 {
@@ -97,6 +98,7 @@ public struct LC2200Assembler {
         }
         return memory
     }
+
 }
 
 internal struct LanguageMap {
@@ -124,12 +126,12 @@ internal struct LanguageMap {
         "$ra": 15
     ]
     static let instructions = [
-        "add":  0b000,
+        "add": 0b000,
         "nand": 0b001,
         "addi": 0b010,
-        "lw":   0b011,
-        "sw":   0b100,
-        "beq":  0b101,
+        "lw": 0b011,
+        "sw": 0b100,
+        "beq": 0b101,
         "jalr": 0b110,
         "spop": 0b111,
     ]
