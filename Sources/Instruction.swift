@@ -16,7 +16,7 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         }
     }
 
-    internal init(string: String) {
+    internal init(string: String) throws {
         let operationComponents = string.componentsSeparatedByCharactersInSet(LanguageMap.delimiterSet).filter { $0 != "" }
         self.operation = Operation(string: operationComponents[0])!
         self.registerX = .Zero
@@ -31,14 +31,25 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         case .Immediate:
             self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
             self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
-            self.offset = Int8(operationComponents[3], radix: 10)!
+            if let offset = Int8(operationComponents[3], radix: 10) {
+                self.offset = offset
+            } else {
+                throw AssemblerError.OffsetTooLarge(offset: Int(operationComponents[3])!, instruction: string)
+            }
         case .Jump:
             self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
             self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
         case .SPop:
-            self.offset = Int8(operationComponents[1], radix: 10)!
+            if let offset = Int8(operationComponents[1], radix: 10) {
+                self.offset = offset
+            } else {
+                throw AssemblerError.OffsetTooLarge(offset: Int(operationComponents[1])!, instruction: string)
+            }
         default:
-            fatalError("Error - instruction parse failure")
+            throw AssemblerError.UnrecognizedInstruction(string: string)
+        }
+        if (offset >= 16 || offset < -16) {
+            throw AssemblerError.OffsetTooLarge(offset: Int(offset), instruction: string)
         }
     }
 

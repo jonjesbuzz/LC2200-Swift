@@ -36,12 +36,19 @@ public struct CommandLineUI {
                 let instructions = try String(contentsOfFile: filename, encoding: NSUTF8StringEncoding)
                 var assembler = LC2200Assembler(source: instructions)
                 print("Assembling \(filename)")
-                let str = assembler.assemble().reduce("") { "\($0) \(String(format: "%04X", $1))" }
+                let assembled = try assembler.assemble()
+                let str = assembled.reduce("") { "\($0) \(String(format: "%04X", $1))" }
                 let lcFile = "\(filename.substringToIndex(filename.endIndex.predecessor().predecessor())).lc"
                 print("Writing output to \(lcFile)")
                 try str.writeToFile(lcFile, atomically: true, encoding: NSUTF8StringEncoding)
                 print("Loaded \(filename) into memory, via assembler.")
-                processor.setupMemory(assembler.assemble())
+                processor.setupMemory(assembled)
+            } catch AssemblerError.OffsetTooLarge(let offset, let instruction) {
+                print("Offset \(offset) is too large on line \(instruction)")
+                exit(1)
+            } catch AssemblerError.UnrecognizedInstruction(let line) {
+                print("Unrecognized instruction on line \(line)")
+                exit(1)
             } catch {
                 print(error)
                 exit(1)
