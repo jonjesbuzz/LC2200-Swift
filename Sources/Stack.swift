@@ -1,26 +1,26 @@
-public struct Stack<E> {
+internal struct Stack<E> {
     private var backing = [E]()
 
-    public mutating func push(data: E) {
+    internal mutating func push(data: E) {
         backing.append(data)
     }
 
-    public mutating func pop() -> E? {
+    internal mutating func pop() -> E? {
         if backing.isEmpty {
             return nil
         }
         return backing.removeLast()
     }
 
-    public mutating func removeAll() {
+    internal mutating func removeAll() {
         backing.removeAll()
     }
 
-    public var isEmpty: Bool {
+    internal var isEmpty: Bool {
         return backing.isEmpty
     }
 
-    public var count: Int {
+    internal var count: Int {
         return backing.count
     }
 }

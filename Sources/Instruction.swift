@@ -1,6 +1,6 @@
-public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible {
+internal struct Instruction: CustomStringConvertible, CustomDebugStringConvertible {
 
-    public init(value: UInt16) {
+    internal init(value: UInt16) {
         let opcode: UInt8 = UInt8((value & 0xE000) >> 13)
         self.operation = Operation(rawValue: opcode)
         let regX = UInt8((value & 0x1E00) >> 9)
@@ -16,7 +16,57 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         }
     }
 
-    public var description: String {
+    internal init(string: String) {
+        let operationComponents = string.componentsSeparatedByCharactersInSet(LanguageMap.delimiterSet).filter { $0 != "" }
+        self.operation = Operation(string: operationComponents[0])!
+        self.registerX = .Zero
+        self.registerY = .Zero
+        self.registerZ = .Zero
+        self.offset = 0
+        switch operation.type {
+        case .Register:
+            self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
+            self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
+            self.registerZ = RegisterFile.Register(symbol: operationComponents[3])!
+        case .Immediate:
+            self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
+            self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
+            self.offset = Int8(operationComponents[3], radix: 10)!
+        case .Jump:
+            self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
+            self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
+        case .SPop:
+            self.offset = Int8(operationComponents[1], radix: 10)!
+        default:
+            fatalError("Error - instruction parse failure")
+        }
+    }
+
+    internal var assembledInstruction: UInt16 {
+        var instruction: UInt16 = 0x0000
+        let operation = self.operation.rawValue
+        instruction |= (UInt16(operation) << 13) & 0xE000
+        switch self.operation.type {
+        case .Register:
+            instruction |= (UInt16(registerX.rawValue) << 9) & 0x1E00
+            instruction |= (UInt16(registerY.rawValue) << 5) & 0x01E0
+            instruction |= (UInt16(registerZ.rawValue)) & 0x000F
+        case .Immediate:
+            instruction |= (UInt16(registerX.rawValue) << 9) & 0x1E00
+            instruction |= (UInt16(registerY.rawValue) << 5) & 0x01E0
+            instruction |= (UInt16(bitPattern: Int16(offset)) & 0x001F)
+        case .Jump:
+            instruction |= (UInt16(registerX.rawValue) << 9) & 0x1E00
+            instruction |= (UInt16(registerY.rawValue) << 5) & 0x01E0
+        case .SPop:
+            instruction |= (UInt16(bitPattern: Int16(offset)) & 0x001F)
+        default:
+            fatalError("Error - instruction parse failure")
+        }
+        return instruction
+    }
+
+    internal var description: String {
         switch operation.type {
         case .Register:
             return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)\tRegZ: \(self.registerZ)"
@@ -31,7 +81,7 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         }
     }
 
-    public var debugDescription: String {
+    internal var debugDescription: String {
         switch operation.type {
         case .Register:
             return "\(self.operation) \(self.registerX), \(self.registerY), \(self.registerZ)"
@@ -46,17 +96,17 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         }
     }
 
-    public struct Operation: OptionSetType, CustomStringConvertible {
-        public enum OperationType {
+    internal struct Operation: OptionSetType, CustomStringConvertible {
+        internal enum OperationType {
             case None
             case Register
             case Immediate
             case Jump
             case SPop
         }
-        public let rawValue: UInt8
+        internal let rawValue: UInt8
         var type: OperationType = .Immediate
-        public init(rawValue: UInt8) {
+        internal init(rawValue: UInt8) {
             self.rawValue = rawValue
             if rawValue == 0b000 || rawValue == 0b001 {
                 self.type = .Register
@@ -66,21 +116,43 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
                 self.type = .SPop
             }
         }
-        public init(rawValue: UInt8, type: OperationType) {
+        internal init(rawValue: UInt8, type: OperationType) {
             self.init(rawValue: rawValue)
             self.type = type
         }
+        internal init?(string: String) {
+            switch string.uppercaseString {
+            case "ADD":
+                self = Operation.Add
+            case "ADDI":
+                self = Operation.AddImmediate
+            case "NAND":
+                self = Operation.Nand
+            case "LW":
+                self = Operation.LoadWord
+            case "SW":
+                self = Operation.StoreWord
+            case "BEQ":
+                self = Operation.BranchEq
+            case "JALR":
+                self = Operation.JumpAndLink
+            case "SPOP":
+                self = Operation.SPop
+            default:
+                return nil
+            }
+        }
 
-        public static let Add = Operation(rawValue: 0b000, type: .Register)
-        public static let Nand = Operation(rawValue: 0b001, type: .Register)
-        public static let AddImmediate = Operation(rawValue: 0b010, type: .Immediate)
-        public static let LoadWord = Operation(rawValue: 0b011, type: .Immediate)
-        public static let StoreWord = Operation(rawValue: 0b100, type: .Immediate)
-        public static let BranchEq = Operation(rawValue: 0b101, type: .Immediate)
-        public static let JumpAndLink = Operation(rawValue: 0b110, type: .Jump)
-        public static let SPop = Operation(rawValue: 0b111, type: .SPop)
+        internal static let Add = Operation(rawValue: 0b000, type: .Register)
+        internal static let Nand = Operation(rawValue: 0b001, type: .Register)
+        internal static let AddImmediate = Operation(rawValue: 0b010, type: .Immediate)
+        internal static let LoadWord = Operation(rawValue: 0b011, type: .Immediate)
+        internal static let StoreWord = Operation(rawValue: 0b100, type: .Immediate)
+        internal static let BranchEq = Operation(rawValue: 0b101, type: .Immediate)
+        internal static let JumpAndLink = Operation(rawValue: 0b110, type: .Jump)
+        internal static let SPop = Operation(rawValue: 0b111, type: .SPop)
 
-        public var description: String {
+        internal var description: String {
             switch self {
             case Instruction.Operation.Add:
                 return "ADD"
@@ -104,9 +176,9 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         }
     }
 
-    public let operation: Operation
-    public let registerX: RegisterFile.Register
-    public let registerY: RegisterFile.Register
-    public let registerZ: RegisterFile.Register
-    public var offset: Int8
+    private(set) internal var operation: Operation
+    private(set) internal var registerX: RegisterFile.Register
+    private(set) internal var registerY: RegisterFile.Register
+    private(set) internal var registerZ: RegisterFile.Register
+    private(set) internal var offset: Int8
 }

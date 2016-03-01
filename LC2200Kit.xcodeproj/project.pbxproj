@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ABC6A64D1C855632009510BE /* LC2200Assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC6A64C1C855632009510BE /* LC2200Assembler.swift */; };
+		ABC6A64E1C85564E009510BE /* LC2200Assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC6A64C1C855632009510BE /* LC2200Assembler.swift */; };
+		ABC6A64F1C85564E009510BE /* LC2200Assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC6A64C1C855632009510BE /* LC2200Assembler.swift */; };
+		ABC6A6501C85564F009510BE /* LC2200Assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC6A64C1C855632009510BE /* LC2200Assembler.swift */; };
+		ABC6A6511C855789009510BE /* Instruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD1FA651C82078100BB9C0C /* Instruction.swift */; };
+		ABC6A6521C85578A009510BE /* Instruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD1FA651C82078100BB9C0C /* Instruction.swift */; };
+		ABC6A6531C85578A009510BE /* Instruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD1FA651C82078100BB9C0C /* Instruction.swift */; };
+		ABC6A6541C855792009510BE /* RegisterFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD1FA691C82078100BB9C0C /* RegisterFile.swift */; };
+		ABC6A6551C855792009510BE /* RegisterFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD1FA691C82078100BB9C0C /* RegisterFile.swift */; };
+		ABC6A6561C855793009510BE /* RegisterFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD1FA691C82078100BB9C0C /* RegisterFile.swift */; };
 		ABD1FA4D1C82072800BB9C0C /* LC2200Kit.h in Headers */ = {isa = PBXBuildFile; fileRef = ABD1FA4C1C82072800BB9C0C /* LC2200Kit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABD1FA541C82072800BB9C0C /* LC2200Kit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD1FA491C82072800BB9C0C /* LC2200Kit.framework */; };
 		ABD1FA591C82072800BB9C0C /* LC2200KitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD1FA581C82072800BB9C0C /* LC2200KitTests.swift */; };
@@ -31,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		ABC6A64C1C855632009510BE /* LC2200Assembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LC2200Assembler.swift; sourceTree = "<group>"; };
 		ABD1FA491C82072800BB9C0C /* LC2200Kit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LC2200Kit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABD1FA4C1C82072800BB9C0C /* LC2200Kit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LC2200Kit.h; sourceTree = "<group>"; };
 		ABD1FA4E1C82072800BB9C0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -135,6 +146,7 @@
 		ABD1FA631C82078100BB9C0C /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				ABC6A64C1C855632009510BE /* LC2200Assembler.swift */,
 				ABD1FA651C82078100BB9C0C /* Instruction.swift */,
 				ABD1FA661C82078100BB9C0C /* LC2200Processor.swift */,
 				ABD1FA691C82078100BB9C0C /* RegisterFile.swift */,
@@ -375,6 +387,7 @@
 				ABD1FA711C82078100BB9C0C /* RegisterFile.swift in Sources */,
 				ABD1FA6D1C82078100BB9C0C /* Instruction.swift in Sources */,
 				ABD1FA731C82078100BB9C0C /* Stack.swift in Sources */,
+				ABC6A64D1C855632009510BE /* LC2200Assembler.swift in Sources */,
 				ABD1FA721C82078100BB9C0C /* RewindInfo.swift in Sources */,
 				ABD1FA6E1C82078100BB9C0C /* LC2200Processor.swift in Sources */,
 			);
@@ -392,6 +405,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABC6A6541C855792009510BE /* RegisterFile.swift in Sources */,
+				ABC6A6511C855789009510BE /* Instruction.swift in Sources */,
+				ABC6A64E1C85564E009510BE /* LC2200Assembler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,6 +415,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABC6A6551C855792009510BE /* RegisterFile.swift in Sources */,
+				ABC6A6521C85578A009510BE /* Instruction.swift in Sources */,
+				ABC6A64F1C85564E009510BE /* LC2200Assembler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,6 +425,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABC6A6561C855793009510BE /* RegisterFile.swift in Sources */,
+				ABC6A6531C85578A009510BE /* Instruction.swift in Sources */,
+				ABC6A6501C85564F009510BE /* LC2200Assembler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

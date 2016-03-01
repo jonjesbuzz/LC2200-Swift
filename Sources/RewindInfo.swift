@@ -1,20 +1,20 @@
-public struct RewindInfo {
-    public var value: UInt16
-    public var programCounter: UInt16
-    public var register: RegisterFile.Register?
-    public var memoryAddress: Int?
+internal struct RewindInfo {
+    internal var value: UInt16
+    internal var programCounter: UInt16
+    internal var register: RegisterFile.Register?
+    internal var memoryAddress: Int?
 
-    public init(value: UInt16, programCounter: UInt16) {
+    internal init(value: UInt16, programCounter: UInt16) {
         self.value = value
         self.programCounter = programCounter
     }
-    public init(value: UInt16, programCounter: UInt16, register: RegisterFile.Register) {
+    internal init(value: UInt16, programCounter: UInt16, register: RegisterFile.Register) {
         self.value = value
         self.programCounter = programCounter
         self.register = register
     }
 
-    public init(value: UInt16, programCounter: UInt16, memoryAddress: Int) {
+    internal init(value: UInt16, programCounter: UInt16, memoryAddress: Int) {
         self.value = value
         self.programCounter = programCounter
         self.memoryAddress = memoryAddress

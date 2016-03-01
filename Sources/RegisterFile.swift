@@ -61,7 +61,7 @@ public struct RegisterFile: CustomStringConvertible {
             }
         }
 
-        init?(symbol: String) {
+        internal init?(symbol: String) {
             switch symbol {
             case "$zero":
                 self = .Zero

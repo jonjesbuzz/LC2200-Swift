@@ -30,9 +30,25 @@ public struct CommandLineUI {
         if arguments.count == 1 || (arguments.count == 2 && arguments[1] == "--debug") {
             print("Loaded default/compiled program")
             processor.setupMemory(Program.program)
+        } else if arguments.count > 2 && arguments[1].hasSuffix(".s") {
+            let filename = arguments[1]
+            do {
+                let instructions = try String(contentsOfFile: filename, encoding: NSUTF8StringEncoding)
+                var assembler = LC2200Assembler(source: instructions)
+                print("Assembling \(filename)")
+                let str = assembler.assemble().reduce("") { "\($0) \(String(format: "%04X", $1))" }
+                let lcFile = "\(filename.substringToIndex(filename.endIndex.predecessor().predecessor())).lc"
+                print("Writing output to \(lcFile)")
+                try str.writeToFile(lcFile, atomically: true, encoding: NSUTF8StringEncoding)
+                print("Loaded \(filename) into memory, via assembler.")
+                processor.setupMemory(assembler.assemble())
+            } catch {
+                print(error)
+                exit(1)
+            }
         } else {
             do {
-                let memory = try String(contentsOfFile: Process.arguments[1], encoding: NSUTF8StringEncoding)
+                let memory = try String(contentsOfFile: arguments[1], encoding: NSUTF8StringEncoding)
                 let vals = memory.characters.split { $0 == " " || $0 == "\n" }.map(String.init)
                 let things = vals.map { (s) -> (UInt16) in
                     if let data = UInt16(s, radix: 16) {

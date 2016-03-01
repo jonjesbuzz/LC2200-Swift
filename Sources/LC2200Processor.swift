@@ -17,56 +17,56 @@ public struct LC2200Processor {
 
     private var rewindStack = Stack<RewindInfo>()
 
-    public mutating func setupMemory(words: [UInt16]) {
+    private mutating func setupMemory(words: [UInt16]) {
         self.originalMemory = words
         self.memory[0..<words.count] = words[0..<words.count]
     }
 
-    public mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
+    private mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = UInt16(Int16(bitPattern: registers[ry]) + Int16(bitPattern: registers[rz]))
     }
 
-    public mutating func nand(rx: Register, _ ry: Register, _ rz: Register) {
+    private mutating func nand(rx: Register, _ ry: Register, _ rz: Register) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = ~(registers[ry] & registers[rz])
     }
 
-    public mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
+    private mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = UInt16(bitPattern: Int16(bitPattern: registers[ry]) + Int16(offset))
     }
 
-    public mutating func lw(rx: Register, _ ry: Register, offset: Int8) {
+    private mutating func lw(rx: Register, _ ry: Register, offset: Int8) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = memory[Int(registers[ry]) + Int(offset)]
     }
 
-    public mutating func sw(rx: Register, _ ry: Register, offset: Int8) {
+    private mutating func sw(rx: Register, _ ry: Register, offset: Int8) {
         rewindStack.push(RewindInfo(value: memory[Int(registers[ry]) + Int(offset)], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
         memory[Int(registers[ry]) + Int(offset)] = registers[rx]
     }
 
-    public mutating func beq(rx: Register, _ ry: Register, address: UInt16) {
+    private mutating func beq(rx: Register, _ ry: Register, address: UInt16) {
         rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         if registers[rx] == registers[ry] {
             currentAddress = address
         }
     }
 
-    public mutating func jalr(rx: Register, _ ry: Register = .ReturnAddr) {
+    private mutating func jalr(rx: Register, _ ry: Register = .ReturnAddr) {
         rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         registers[ry] = currentAddress
         currentAddress = registers[rx]
     }
 
-    public mutating func spop(controlCode: UInt) {
+    private mutating func spop(controlCode: UInt) {
         if controlCode == 0 {
             shouldRun = false
         }
     }
 
-    public mutating func executeInstruction(instr: Instruction) {
+    private mutating func executeInstruction(instr: Instruction) {
         currentAddress += 1
         switch instr.operation {
         case Instruction.Operation.Add:
