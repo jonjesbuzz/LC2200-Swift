@@ -1,6 +1,6 @@
 public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible {
 
-    internal init(value: UInt16) {
+    public init(value: UInt16) {
         let opcode: UInt8 = UInt8((value & 0xE000) >> 13)
         self.operation = Operation(rawValue: opcode)
         let regX = UInt8((value & 0x1E00) >> 9)
