@@ -30,7 +30,7 @@ public struct CommandLineUI {
         if arguments.count == 1 || (arguments.count == 2 && arguments[1] == "--debug") {
             print("Loaded default/compiled program")
             processor.setupMemory(Program.program)
-        } else if arguments.count > 2 && arguments[1].hasSuffix(".s") {
+        } else if arguments.count >= 2 && arguments[1].hasSuffix(".s") {
             let filename = arguments[1]
             do {
                 let instructions = try String(contentsOfFile: filename, encoding: NSUTF8StringEncoding)

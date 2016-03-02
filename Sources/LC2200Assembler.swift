@@ -52,8 +52,8 @@ public struct LC2200Assembler {
                 lines.insert("lw \(instr[1]) 2(\(instr[1]))", atIndex: index)
                 lines.insert("jalr \(instr[1]), \(instr[1])", atIndex: index)
             }
-            if instr[0].lowercaseString == ".orig" {
-                print(".orig is not yet supported.")
+            if instr[0].lowercaseString == ".orig" || instr[0].lowercaseString == ".blkw" {
+                print(".orig and .blkw are not supported.")
             }
             index += 1
         }
@@ -98,8 +98,11 @@ public struct LC2200Assembler {
                     if num.hasPrefix("0x") {
                         num = num.substringFromIndex(num.startIndex.advancedBy(2))
                     }
-                    let addr16 = UInt16(num, radix: 16)!
-                    memory.append(addr16)
+                    if let addr16 = UInt16(num, radix: 16) {
+                        memory.append(addr16)
+                    } else {
+                        throw AssemblerError.NotANumber(instruction: line)
+                    }
                 }
             } else {
                 let instr = try Instruction(string: line)
@@ -114,6 +117,7 @@ public struct LC2200Assembler {
 public enum AssemblerError: ErrorType {
     case OffsetTooLarge(offset: Int, instruction: String)
     case UnrecognizedInstruction(string: String)
+    case NotANumber(instruction: String)
 }
 
 internal struct LanguageMap {
@@ -122,34 +126,6 @@ internal struct LanguageMap {
     static let commentCharacterSet = NSCharacterSet(charactersInString: "!")
     static let delimiterSet = NSCharacterSet(charactersInString: ", ")
 
-    static let registers: [String: Int] = [
-        "$zero": 0,
-        "$at": 1,
-        "$v0": 2,
-        "$a0": 3,
-        "$a1": 4,
-        "$a2": 5,
-        "$t0": 6,
-        "$t1": 7,
-        "$t2": 8,
-        "$s0": 9,
-        "$s1": 10,
-        "$s2": 11,
-        "$k0": 12,
-        "$sp": 13,
-        "$fp": 14,
-        "$ra": 15
-    ]
-    static let instructions = [
-        "add": 0b000,
-        "nand": 0b001,
-        "addi": 0b010,
-        "lw": 0b011,
-        "sw": 0b100,
-        "beq": 0b101,
-        "jalr": 0b110,
-        "spop": 0b111,
-    ]
     static let pseudoops = [
         "noop": 0x0000,
         "halt": 0xE000
