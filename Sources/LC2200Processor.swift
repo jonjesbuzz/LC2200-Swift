@@ -24,7 +24,8 @@ public struct LC2200Processor {
 
     private mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
-        registers[rx] = UInt16(Int16(bitPattern: registers[ry]) + Int16(bitPattern: registers[rz]))
+        let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(bitPattern: registers[rz])).0
+        registers[rx] = UInt16(bitPattern: added)
     }
 
     private mutating func nand(rx: Register, _ ry: Register, _ rz: Register) {
@@ -34,7 +35,8 @@ public struct LC2200Processor {
 
     private mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
-        registers[rx] = UInt16(bitPattern: Int16(bitPattern: registers[ry]) + Int16(offset))
+        let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(offset)).0
+        registers[rx] = UInt16(bitPattern: added)
     }
 
     private mutating func lw(rx: Register, _ ry: Register, offset: Int8) {
@@ -67,6 +69,10 @@ public struct LC2200Processor {
     }
 
     private mutating func executeInstruction(instr: Instruction) {
+        guard currentAddress != 0xFFFF else {
+            shouldRun = false
+            return;
+        }
         currentAddress += 1
         switch instr.operation {
         case Instruction.Operation.Add:
