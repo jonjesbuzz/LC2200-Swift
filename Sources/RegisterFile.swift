@@ -1,6 +1,6 @@
 public struct RegisterFile: CustomStringConvertible {
 
-    var registers = [UInt16](count: 16, repeatedValue: 0)
+    var registers = [UInt16](repeating: 0, count: 16)
 
     public var count: Int {
         return registers.count
@@ -130,7 +130,7 @@ public struct RegisterFile: CustomStringConvertible {
 
     public var description: String {
         var answer = ""
-        for (i, v) in registers.enumerate() {
+        for (i, v) in registers.enumerated() {
             if i < 13 {
                 answer += "\(Register(rawValue: UInt8(i))!):\t \(Int16(bitPattern: v))\n"
             } else {
