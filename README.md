@@ -9,7 +9,7 @@ To assemble a file, give it the `.s` file.  It will assemble, write the output, 
 
 To run an already-assembled file, give it the `.lc` file, and it will load it straight into memory.
 
-This code was tested using the February 25th Development Snapshot of Swift on OS X.
+This code was tested using the February 25th Development Snapshot of Swift on macOS.
 
 ## Building
 With the Swift open-source toolchain [installed and set in your path](https://swift.org/download/#latest-development-snapshots):
@@ -28,7 +28,7 @@ Running the simulator with `--debug` will enable a GDB-like debugger.
 These (probably) need to be written at some point. `:|`
 
 ## Framework
-This simulator can also be compiled as a framework for iOS, OS X, tvOS (LOL), and watchOS (LOLOLOL).  Use [Carthage](https://github.com/Carthage/Carthage) to install the framework into your project.
+This simulator can also be compiled as a framework for iOS, macOS, tvOS (LOL), and watchOS (LOLOLOL).  Use [Carthage](https://github.com/Carthage/Carthage) to install the framework into your project.
 
 ## Documentation
 
