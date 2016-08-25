@@ -27,7 +27,7 @@ public struct LC2200Assembler {
                 lines[index] = comment[0]
             }
         }
-        lines = lines.map { $0.trimmingCharacters(in: NSCharacterSet.whitespaces()) }.filter { $0 != "" }
+        lines = lines.map { $0.trimmingCharacters(in: CharacterSet.whitespaces) }.filter { $0 != "" }
         var index = 0
         while index < lines.count {
             let line = lines[index]
@@ -35,10 +35,10 @@ public struct LC2200Assembler {
             if labeledLine.count > 2 {
                 fatalError("Multiple labels on same line")
             } else if labeledLine.count == 1 {
-                lines[index] = labeledLine[0].trimmingCharacters(in: NSCharacterSet.whitespaces())
+                lines[index] = labeledLine[0].trimmingCharacters(in: CharacterSet.whitespaces)
             } else if labeledLine.count > 1 {
-                labels[labeledLine[0].trimmingCharacters(in: NSCharacterSet.whitespaces())] = UInt16(index)
-                lines[index] = labeledLine[1].trimmingCharacters(in: NSCharacterSet.whitespaces())
+                labels[labeledLine[0].trimmingCharacters(in: CharacterSet.whitespaces)] = UInt16(index)
+                lines[index] = labeledLine[1].trimmingCharacters(in: CharacterSet.whitespaces)
             }
             if lines[index] == "" {
                 lines.remove(at: index)
@@ -74,7 +74,7 @@ public struct LC2200Assembler {
                     lines[index] = "\(instr[0]) \(instr[1]), \(instr[2]), \(offset)"
                 }
             } else if instr.count == 3 && (instr[0].lowercased() == "lw" || instr[0].lowercased() == "sw") {
-                let offsetInformation = instr[2].components(separatedBy: NSCharacterSet(charactersIn: "()")).map { $0.trimmingCharacters(in: NSCharacterSet.whitespaces()) }
+                let offsetInformation = instr[2].components(separatedBy: CharacterSet(charactersIn: "()")).map { $0.trimmingCharacters(in: CharacterSet.whitespaces) }
                 lines[index] = "\(instr[0]) \(instr[1]), \(offsetInformation[1]), \(offsetInformation[0])"
                 let offset = Int8(offsetInformation[0], radix: 10)!
                 if (offset >= 16 || offset < -16) {
@@ -114,7 +114,7 @@ public struct LC2200Assembler {
 
 }
 
-public enum AssemblerError: ErrorProtocol {
+public enum AssemblerError: Error {
     case OffsetTooLarge(offset: Int, instruction: String)
     case UnrecognizedInstruction(string: String)
     case NotANumber(instruction: String)
@@ -122,9 +122,9 @@ public enum AssemblerError: ErrorProtocol {
 
 internal struct LanguageMap {
 
-    static let labelCharacterSet = NSCharacterSet(charactersIn: ":")
-    static let commentCharacterSet = NSCharacterSet(charactersIn: "!")
-    static let delimiterSet = NSCharacterSet(charactersIn: ", ")
+    static let labelCharacterSet = CharacterSet(charactersIn: ":")
+    static let commentCharacterSet = CharacterSet(charactersIn: "!")
+    static let delimiterSet = CharacterSet(charactersIn: ", ")
 
     static let pseudoops = [
         "noop": 0x0000,

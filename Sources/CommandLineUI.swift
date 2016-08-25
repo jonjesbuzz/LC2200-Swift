@@ -23,24 +23,24 @@ public struct CommandLineUI {
     private var arguments: [String]
     public init(arguments: [String]) {
         self.arguments = arguments
-        initializeProcessor()
+        initializeCommandLineor()
     }
 
-    private mutating func initializeProcessor() {
+    private mutating func initializeCommandLineor() {
         if arguments.count == 1 || (arguments.count == 2 && arguments[1] == "--debug") {
             print("Loaded default/compiled program")
             processor.setupMemory(words: Program.program)
         } else if arguments.count >= 2 && arguments[1].hasSuffix(".s") {
             let filename = arguments[1]
             do {
-                let instructions = try String(contentsOfFile: filename, encoding: NSUTF8StringEncoding)
+                let instructions = try String(contentsOfFile: filename, encoding: String.Encoding.utf8)
                 var assembler = LC2200Assembler(source: instructions)
                 print("Assembling \(filename)")
                 let assembled = try assembler.assemble()
                 let str = assembled.reduce("") { "\($0) \(String(format: "%04X", $1))" }
                 let lcFile = "\(filename.substring(to: filename.index(filename.endIndex, offsetBy: -2))).lc"
                 print("Writing output to \(lcFile)")
-                try str.write(toFile: lcFile, atomically: true, encoding: NSUTF8StringEncoding)
+                try str.write(toFile: lcFile, atomically: true, encoding: String.Encoding.utf8)
                 print("Loaded \(filename) into memory, via assembler.")
                 processor.setupMemory(words: assembled)
             } catch AssemblerError.OffsetTooLarge(let offset, let instruction) {
@@ -55,17 +55,17 @@ public struct CommandLineUI {
             }
         } else {
             do {
-                let memory = try String(contentsOfFile: arguments[1], encoding: NSUTF8StringEncoding)
+                let memory = try String(contentsOfFile: arguments[1], encoding: String.Encoding.utf8)
                 let vals = memory.characters.split { $0 == " " || $0 == "\n" }.map(String.init)
                 let things = vals.map { (s) -> (UInt16) in
                     if let data = UInt16(s, radix: 16) {
                         return data
                     }
-                    print("File \(Process.arguments[1]) is not a valid LC2200 file.")
+                    print("File \(CommandLine.arguments[1]) is not a valid LC2200 file.")
                     exit(1)
                 }
                 processor.setupMemory(words: things)
-                print("Loaded \(Process.arguments[1])")
+                print("Loaded \(CommandLine.arguments[1])")
             } catch {
                 print(error)
                 exit(1)
@@ -74,7 +74,7 @@ public struct CommandLineUI {
     }
 
     public mutating func start() {
-        if Process.arguments.contains("--debug") {
+        if CommandLine.arguments.contains("--debug") {
             self.runDebugMode()
         } else {
             self.run()
@@ -95,7 +95,7 @@ public struct CommandLineUI {
             let readCommand = readLine(strippingNewline: true)?.lowercased()
 
             // Parse out the argument (used in breakpoint)
-            if let readCommand = readCommand where readCommand != "" {
+            if let readCommand = readCommand, readCommand != "" {
                 let args = readCommand.characters.split { $0 == " " }.map(String.init)
                 command = args[0]
                 commandArg = args.last ?? ""

@@ -1,2 +1,2 @@
-var cli = CommandLineUI(arguments: Process.arguments)
+var cli = CommandLineUI(arguments: CommandLine.arguments)
 cli.start()
