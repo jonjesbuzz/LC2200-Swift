@@ -1,74 +1,74 @@
 public struct LC2200Processor {
 
-    private var printingEnabled: Bool
+    fileprivate var printingEnabled: Bool
 
     public init(shouldPrint: Bool = false) {
         self.printingEnabled = shouldPrint
     }
 
     public typealias Register = RegisterFile.Register
-    private(set) public var registers = RegisterFile()
-    private(set) public var memory = [UInt16](repeating: 0, count: 64 * 1024)
-    private var originalMemory = [UInt16]()
-    private(set) public var currentAddress: UInt16 = 0x0000
-    private var shouldRun = true
+    fileprivate(set) public var registers = RegisterFile()
+    fileprivate(set) public var memory = [UInt16](repeating: 0, count: 64 * 1024)
+    fileprivate var originalMemory = [UInt16]()
+    fileprivate(set) public var currentAddress: UInt16 = 0x0000
+    fileprivate var shouldRun = true
 
-    private var breakpoints = Set<UInt16>()
+    fileprivate var breakpoints = Set<UInt16>()
 
-    private var rewindStack = Stack<RewindInfo>()
+    fileprivate var rewindStack = Stack<RewindInfo>()
 
-    public mutating func setupMemory(words: [UInt16]) {
+    public mutating func setupMemory(_ words: [UInt16]) {
         self.originalMemory = words
         self.memory[0..<words.count] = words[0..<words.count]
     }
 
-    private mutating func add(_ rx: Register, _ ry: Register, _ rz: Register) {
-        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    fileprivate mutating func add(_ rx: Register, _ ry: Register, _ rz: Register) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(bitPattern: registers[rz])).0
         registers[rx] = UInt16(bitPattern: added)
     }
 
-    private mutating func nand(_ rx: Register, _ ry: Register, _ rz: Register) {
-        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    fileprivate mutating func nand(_ rx: Register, _ ry: Register, _ rz: Register) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = ~(registers[ry] & registers[rz])
     }
 
-    private mutating func addi(_ rx: Register, _ ry: Register, offset: Int8) {
-        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    fileprivate mutating func addi(_ rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(offset)).0
         registers[rx] = UInt16(bitPattern: added)
     }
 
-    private mutating func lw(_ rx: Register, _ ry: Register, offset: Int8) {
-        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    fileprivate mutating func lw(_ rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = memory[Int(registers[ry]) + Int(offset)]
     }
 
-    private mutating func sw(_ rx: Register, _ ry: Register, offset: Int8) {
-        rewindStack.push(data: RewindInfo(value: memory[Int(registers[ry]) + Int(offset)], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
+    fileprivate mutating func sw(_ rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(RewindInfo(value: memory[Int(registers[ry]) + Int(offset)], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
         memory[Int(registers[ry]) + Int(offset)] = registers[rx]
     }
 
-    private mutating func beq(_ rx: Register, _ ry: Register, address: UInt16) {
-        rewindStack.push(data: RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
+    fileprivate mutating func beq(_ rx: Register, _ ry: Register, address: UInt16) {
+        rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         if registers[rx] == registers[ry] {
             currentAddress = address
         }
     }
 
-    private mutating func jalr(_ rx: Register, _ ry: Register = .ReturnAddr) {
-        rewindStack.push(data: RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
+    fileprivate mutating func jalr(_ rx: Register, _ ry: Register = .returnAddr) {
+        rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         registers[ry] = currentAddress
         currentAddress = registers[rx]
     }
 
-    private mutating func spop(_ controlCode: UInt) {
+    fileprivate mutating func spop(_ controlCode: UInt) {
         if controlCode == 0 {
             shouldRun = false
         }
     }
 
-    private mutating func executeInstruction(_ instr: Instruction) {
+    fileprivate mutating func executeInstruction(_ instr: Instruction) {
         guard currentAddress != 0xFFFF else {
             shouldRun = false
             return;
@@ -125,7 +125,7 @@ public struct LC2200Processor {
         shouldRun = true
     }
 
-    public func hasBreakpointAtAddress(address: UInt16) -> Bool {
+    public func hasBreakpointAtAddress(_ address: UInt16) -> Bool {
         return breakpoints.contains(address)
     }
 

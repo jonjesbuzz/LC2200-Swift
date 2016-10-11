@@ -29,7 +29,7 @@ public struct CommandLineUI {
     private mutating func initializeCommandLineor() {
         if arguments.count == 1 || (arguments.count == 2 && arguments[1] == "--debug") {
             print("Loaded default/compiled program")
-            processor.setupMemory(words: Program.program)
+            processor.setupMemory(Program.program)
         } else if arguments.count >= 2 && arguments[1].hasSuffix(".s") {
             let filename = arguments[1]
             do {
@@ -42,11 +42,11 @@ public struct CommandLineUI {
                 print("Writing output to \(lcFile)")
                 try str.write(toFile: lcFile, atomically: true, encoding: String.Encoding.utf8)
                 print("Loaded \(filename) into memory, via assembler.")
-                processor.setupMemory(words: assembled)
-            } catch AssemblerError.OffsetTooLarge(let offset, let instruction) {
+                processor.setupMemory(assembled)
+            } catch AssemblerError.offsetTooLarge(let offset, let instruction) {
                 print("Offset \(offset) is too large on line \(instruction)")
                 exit(1)
-            } catch AssemblerError.UnrecognizedInstruction(let line) {
+            } catch AssemblerError.unrecognizedInstruction(let line) {
                 print("Unrecognized instruction on line \(line)")
                 exit(1)
             } catch {
@@ -64,7 +64,7 @@ public struct CommandLineUI {
                     print("File \(CommandLine.arguments[1]) is not a valid LC2200 file.")
                     exit(1)
                 }
-                processor.setupMemory(words: things)
+                processor.setupMemory(things)
                 print("Loaded \(CommandLine.arguments[1])")
             } catch {
                 print(error)

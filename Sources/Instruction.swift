@@ -19,37 +19,37 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
     internal init(string: String) throws {
         let operationComponents = string.components(separatedBy: LanguageMap.delimiterSet).filter { $0 != "" }
         self.operation = Operation(string: operationComponents[0])!
-        self.registerX = .Zero
-        self.registerY = .Zero
-        self.registerZ = .Zero
+        self.registerX = .zero
+        self.registerY = .zero
+        self.registerZ = .zero
         self.offset = 0
         switch operation.type {
-        case .Register:
+        case .register:
             self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
             self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
             self.registerZ = RegisterFile.Register(symbol: operationComponents[3])!
-        case .Immediate:
+        case .immediate:
             self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
             self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
             if let offset = Int8(operationComponents[3], radix: 10) {
                 self.offset = offset
             } else {
-                throw AssemblerError.OffsetTooLarge(offset: Int(operationComponents[3])!, instruction: string)
+                throw AssemblerError.offsetTooLarge(offset: Int(operationComponents[3])!, instruction: string)
             }
-        case .Jump:
+        case .jump:
             self.registerX = RegisterFile.Register(symbol: operationComponents[1])!
             self.registerY = RegisterFile.Register(symbol: operationComponents[2])!
-        case .SPop:
+        case .sPop:
             if let offset = Int8(operationComponents[1], radix: 10) {
                 self.offset = offset
             } else {
-                throw AssemblerError.OffsetTooLarge(offset: Int(operationComponents[1])!, instruction: string)
+                throw AssemblerError.offsetTooLarge(offset: Int(operationComponents[1])!, instruction: string)
             }
         default:
-            throw AssemblerError.UnrecognizedInstruction(string: string)
+            throw AssemblerError.unrecognizedInstruction(string: string)
         }
         if (offset >= 16 || offset < -16) {
-            throw AssemblerError.OffsetTooLarge(offset: Int(offset), instruction: string)
+            throw AssemblerError.offsetTooLarge(offset: Int(offset), instruction: string)
         }
     }
 
@@ -58,18 +58,18 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         let operation = self.operation.rawValue
         instruction |= (UInt16(operation) << 13) & 0xE000
         switch self.operation.type {
-        case .Register:
+        case .register:
             instruction |= (UInt16(registerX.rawValue) << 9) & 0x1E00
             instruction |= (UInt16(registerY.rawValue) << 5) & 0x01E0
             instruction |= (UInt16(registerZ.rawValue)) & 0x000F
-        case .Immediate:
+        case .immediate:
             instruction |= (UInt16(registerX.rawValue) << 9) & 0x1E00
             instruction |= (UInt16(registerY.rawValue) << 5) & 0x01E0
             instruction |= (UInt16(bitPattern: Int16(offset)) & 0x001F)
-        case .Jump:
+        case .jump:
             instruction |= (UInt16(registerX.rawValue) << 9) & 0x1E00
             instruction |= (UInt16(registerY.rawValue) << 5) & 0x01E0
-        case .SPop:
+        case .sPop:
             instruction |= (UInt16(bitPattern: Int16(offset)) & 0x001F)
         default:
             fatalError("Error - instruction parse failure")
@@ -79,52 +79,52 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
 
     public var description: String {
         switch operation.type {
-        case .Register:
+        case .register:
             return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)\tRegZ: \(self.registerZ)"
-        case .Immediate:
+        case .immediate:
             return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)\tOffset: \(self.offset)"
-        case .Jump:
+        case .jump:
             return "Operation: \(self.operation)\tRegX: \(self.registerX)\tRegY: \(self.registerY)"
-        case .SPop:
+        case .sPop:
             return "Operation: \(self.operation)\tControl Code: \(self.offset)"
-        case .None:
+        case .none:
             return "No-op / Illegal Instruction"
         }
     }
 
     public var debugDescription: String {
         switch operation.type {
-        case .Register:
+        case .register:
             return "\(self.operation) \(self.registerX), \(self.registerY), \(self.registerZ)"
-        case .Immediate:
+        case .immediate:
             return "\(self.operation) \(self.registerX), \(self.offset)(\(self.registerY))"
-        case .Jump:
+        case .jump:
             return "\(self.operation) \(self.registerX), \(self.registerY)"
-        case .SPop:
+        case .sPop:
             return "\(self.operation) \(self.offset)"
-        case .None:
+        case .none:
             return "No-op / Illegal Instruction"
         }
     }
 
     internal struct Operation: OptionSet, CustomStringConvertible {
         internal enum OperationType {
-            case None
-            case Register
-            case Immediate
-            case Jump
-            case SPop
+            case none
+            case register
+            case immediate
+            case jump
+            case sPop
         }
         internal let rawValue: UInt8
-        var type: OperationType = .Immediate
+        var type: OperationType = .immediate
         internal init(rawValue: UInt8) {
             self.rawValue = rawValue
             if rawValue == 0b000 || rawValue == 0b001 {
-                self.type = .Register
+                self.type = .register
             } else if rawValue == 0b110 {
-                self.type = .Jump
+                self.type = .jump
             } else if rawValue == 0b111 {
-                self.type = .SPop
+                self.type = .sPop
             }
         }
         internal init(rawValue: UInt8, type: OperationType) {
@@ -154,14 +154,14 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
             }
         }
 
-        internal static let Add = Operation(rawValue: 0b000, type: .Register)
-        internal static let Nand = Operation(rawValue: 0b001, type: .Register)
-        internal static let AddImmediate = Operation(rawValue: 0b010, type: .Immediate)
-        internal static let LoadWord = Operation(rawValue: 0b011, type: .Immediate)
-        internal static let StoreWord = Operation(rawValue: 0b100, type: .Immediate)
-        internal static let BranchEq = Operation(rawValue: 0b101, type: .Immediate)
-        internal static let JumpAndLink = Operation(rawValue: 0b110, type: .Jump)
-        internal static let SPop = Operation(rawValue: 0b111, type: .SPop)
+        internal static let Add = Operation(rawValue: 0b000, type: .register)
+        internal static let Nand = Operation(rawValue: 0b001, type: .register)
+        internal static let AddImmediate = Operation(rawValue: 0b010, type: .immediate)
+        internal static let LoadWord = Operation(rawValue: 0b011, type: .immediate)
+        internal static let StoreWord = Operation(rawValue: 0b100, type: .immediate)
+        internal static let BranchEq = Operation(rawValue: 0b101, type: .immediate)
+        internal static let JumpAndLink = Operation(rawValue: 0b110, type: .jump)
+        internal static let SPop = Operation(rawValue: 0b111, type: .sPop)
 
         internal var description: String {
             switch self {
@@ -187,9 +187,9 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         }
     }
 
-    private(set) internal var operation: Operation
-    private(set) internal var registerX: RegisterFile.Register
-    private(set) internal var registerY: RegisterFile.Register
-    private(set) internal var registerZ: RegisterFile.Register
-    private(set) internal var offset: Int8
+    fileprivate(set) internal var operation: Operation
+    fileprivate(set) internal var registerX: RegisterFile.Register
+    fileprivate(set) internal var registerY: RegisterFile.Register
+    fileprivate(set) internal var registerZ: RegisterFile.Register
+    fileprivate(set) internal var offset: Int8
 }

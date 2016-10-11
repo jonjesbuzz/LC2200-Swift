@@ -3,7 +3,7 @@ import Foundation
 public struct LC2200Assembler {
 
     public let source: String
-    private var labels = [String: UInt16]()
+    fileprivate var labels = [String: UInt16]()
 
     public init(source: String) {
         self.source = source
@@ -11,16 +11,16 @@ public struct LC2200Assembler {
 
     public mutating func assemble() throws -> [UInt16] {
         var lines = preprocess()
-        processCommentsAndLabels(lines: &lines)
-        try changeOffsetFormat(lines: &lines)
-        return try assemble(lines: lines)
+        processCommentsAndLabels(&lines)
+        try changeOffsetFormat(&lines)
+        return try assemble(lines)
     }
 
-    private func preprocess() -> [String] {
+    fileprivate func preprocess() -> [String] {
         return source.characters.split { $0 == "\n" }.map(String.init)
     }
 
-    private mutating func processCommentsAndLabels(lines: inout [String]) {
+    fileprivate mutating func processCommentsAndLabels(_ lines: inout [String]) {
         for (index, line) in lines.enumerated() {
             let comment = line.components(separatedBy: LanguageMap.commentCharacterSet)
             if comment.count > 1 {
@@ -62,14 +62,14 @@ public struct LC2200Assembler {
     /**
      * Makes offsets for BEQ from labels, and switches LW/SW into easier to parse syntax
      */
-    private mutating func changeOffsetFormat(lines: inout [String]) throws {
+    fileprivate mutating func changeOffsetFormat(_ lines: inout [String]) throws {
         for (index, line) in lines.enumerated() {
             let instr: [String] = line.components(separatedBy: LanguageMap.delimiterSet).filter { $0 != "" }
             if instr.count == 4 && instr[0].lowercased() == "beq" {
                 if let labelAddr = labels[instr[3]] {
                     let offset = Int8(Int(labelAddr) - index) - 1
                     if (offset >= 16 || offset < -16) {
-                        throw AssemblerError.OffsetTooLarge(offset: Int(offset), instruction: line)
+                        throw AssemblerError.offsetTooLarge(offset: Int(offset), instruction: line)
                     }
                     lines[index] = "\(instr[0]) \(instr[1]), \(instr[2]), \(offset)"
                 }
@@ -78,13 +78,13 @@ public struct LC2200Assembler {
                 lines[index] = "\(instr[0]) \(instr[1]), \(offsetInformation[1]), \(offsetInformation[0])"
                 let offset = Int8(offsetInformation[0], radix: 10)!
                 if (offset >= 16 || offset < -16) {
-                    throw AssemblerError.OffsetTooLarge(offset: Int(offset), instruction: line)
+                    throw AssemblerError.offsetTooLarge(offset: Int(offset), instruction: line)
                 }
             }
         }
     }
 
-    private mutating func assemble(lines: [String]) throws -> [UInt16] {
+    fileprivate mutating func assemble(_ lines: [String]) throws -> [UInt16] {
         var memory = [UInt16]()
         for line in lines {
             let instr = line.components(separatedBy: LanguageMap.delimiterSet).filter { $0 != "" }
@@ -101,7 +101,7 @@ public struct LC2200Assembler {
                     if let addr16 = UInt16(num, radix: 16) {
                         memory.append(addr16)
                     } else {
-                        throw AssemblerError.NotANumber(instruction: line)
+                        throw AssemblerError.notANumber(instruction: line)
                     }
                 }
             } else {
@@ -115,9 +115,9 @@ public struct LC2200Assembler {
 }
 
 public enum AssemblerError: Error {
-    case OffsetTooLarge(offset: Int, instruction: String)
-    case UnrecognizedInstruction(string: String)
-    case NotANumber(instruction: String)
+    case offsetTooLarge(offset: Int, instruction: String)
+    case unrecognizedInstruction(string: String)
+    case notANumber(instruction: String)
 }
 
 internal struct LanguageMap {

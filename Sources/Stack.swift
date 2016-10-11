@@ -1,7 +1,7 @@
 internal struct Stack<E> {
-    private var backing = [E]()
+    fileprivate var backing = [E]()
 
-    internal mutating func push(data: E) {
+    internal mutating func push(_ data: E) {
         backing.append(data)
     }
 

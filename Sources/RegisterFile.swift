@@ -7,56 +7,56 @@ public struct RegisterFile: CustomStringConvertible {
     }
 
     public enum Register: UInt8, CustomStringConvertible {
-        case Zero = 0
-        case AsmRsrv = 1
-        case ReturnVal = 2
-        case Arg0 = 3
-        case Arg1 = 4
-        case Arg2 = 5
-        case Temp0 = 6
-        case Temp1 = 7
-        case Temp2 = 8
-        case Saved0 = 9
-        case Saved1 = 10
-        case Saved2 = 11
-        case OSTrap = 12
-        case StackPtr = 13
-        case FramePtr = 14
-        case ReturnAddr = 15
+        case zero = 0
+        case asmRsrv = 1
+        case returnVal = 2
+        case arg0 = 3
+        case arg1 = 4
+        case arg2 = 5
+        case temp0 = 6
+        case temp1 = 7
+        case temp2 = 8
+        case saved0 = 9
+        case saved1 = 10
+        case saved2 = 11
+        case osTrap = 12
+        case stackPtr = 13
+        case framePtr = 14
+        case returnAddr = 15
 
         public var description: String {
             switch self {
-            case .Zero:
+            case .zero:
                 return "$zero"
-            case .AsmRsrv:
+            case .asmRsrv:
                 return "$at"
-            case .ReturnVal:
+            case .returnVal:
                 return "$v0"
-            case .Arg0:
+            case .arg0:
                 return "$a0"
-            case .Arg1:
+            case .arg1:
                 return "$a1"
-            case .Arg2:
+            case .arg2:
                 return "$a2"
-            case .Temp0:
+            case .temp0:
                 return "$t0"
-            case .Temp1:
+            case .temp1:
                 return "$t1"
-            case .Temp2:
+            case .temp2:
                 return "$t2"
-            case .Saved0:
+            case .saved0:
                 return "$s0"
-            case .Saved1:
+            case .saved1:
                 return "$s1"
-            case .Saved2:
+            case .saved2:
                 return "$s2"
-            case .OSTrap:
+            case .osTrap:
                 return "$k0"
-            case .StackPtr:
+            case .stackPtr:
                 return "$sp"
-            case .FramePtr:
+            case .framePtr:
                 return "$fp"
-            case .ReturnAddr:
+            case .returnAddr:
                 return "$ra"
             }
         }
@@ -64,37 +64,37 @@ public struct RegisterFile: CustomStringConvertible {
         internal init?(symbol: String) {
             switch symbol {
             case "$zero":
-                self = .Zero
+                self = .zero
             case "$at":
-                self = .AsmRsrv
+                self = .asmRsrv
             case "$v0":
-                self = .ReturnVal
+                self = .returnVal
             case "$a0":
-                self = .Arg0
+                self = .arg0
             case "$a1":
-                self = .Arg1
+                self = .arg1
             case "$a2":
-                self = .Arg2
+                self = .arg2
             case "$t0":
-                self = .Temp0
+                self = .temp0
             case "$t1":
-                self = .Temp1
+                self = .temp1
             case "$t2":
-                self = .Temp2
+                self = .temp2
             case "$s0":
-                self = .Saved0
+                self = .saved0
             case "$s1":
-                self = .Saved1
+                self = .saved1
             case "$s2":
-                self = .Saved2
+                self = .saved2
             case "$k0":
-                self = .OSTrap
+                self = .osTrap
             case "$sp":
-                self = .StackPtr
+                self = .stackPtr
             case "$fp":
-                self = .FramePtr
+                self = .framePtr
             case "$ra":
-                self = .ReturnAddr
+                self = .returnAddr
             default:
                 return nil
             }
@@ -106,7 +106,7 @@ public struct RegisterFile: CustomStringConvertible {
             return registers[Int(r.rawValue)]
         }
         set(newValue) {
-            if r == .Zero {
+            if r == .zero {
                 return
             }
             registers[Int(r.rawValue)] = newValue
