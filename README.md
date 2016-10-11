@@ -9,7 +9,7 @@ To assemble a file, give it the `.s` file.  It will assemble, write the output, 
 
 To run an already-assembled file, give it the `.lc` file, and it will load it straight into memory.
 
-This code was tested using the February 25th Development Snapshot of Swift on macOS.
+This code was tested using the Swift 3.0 release included with Xcode 8 GM.
 
 ## Building
 With the Swift open-source toolchain [installed and set in your path](https://swift.org/download/#latest-development-snapshots):
