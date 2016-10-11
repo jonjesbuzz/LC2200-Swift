@@ -17,7 +17,7 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
     }
 
     internal init(string: String) throws {
-        let operationComponents = string.componentsSeparatedByCharactersInSet(LanguageMap.delimiterSet).filter { $0 != "" }
+        let operationComponents = string.components(separatedBy: LanguageMap.delimiterSet).filter { $0 != "" }
         self.operation = Operation(string: operationComponents[0])!
         self.registerX = .Zero
         self.registerY = .Zero
@@ -107,7 +107,7 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
         }
     }
 
-    internal struct Operation: OptionSetType, CustomStringConvertible {
+    internal struct Operation: OptionSet, CustomStringConvertible {
         internal enum OperationType {
             case None
             case Register
@@ -132,7 +132,7 @@ public struct Instruction: CustomStringConvertible, CustomDebugStringConvertible
             self.type = type
         }
         internal init?(string: String) {
-            switch string.uppercaseString {
+            switch string.uppercased() {
             case "ADD":
                 self = Operation.Add
             case "ADDI":

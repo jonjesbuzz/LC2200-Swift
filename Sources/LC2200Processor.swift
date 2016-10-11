@@ -8,7 +8,7 @@ public struct LC2200Processor {
 
     public typealias Register = RegisterFile.Register
     private(set) public var registers = RegisterFile()
-    private(set) public var memory = [UInt16](count: 64 * 1024, repeatedValue: 0)
+    private(set) public var memory = [UInt16](repeating: 0, count: 64 * 1024)
     private var originalMemory = [UInt16]()
     private(set) public var currentAddress: UInt16 = 0x0000
     private var shouldRun = true
@@ -22,53 +22,53 @@ public struct LC2200Processor {
         self.memory[0..<words.count] = words[0..<words.count]
     }
 
-    private mutating func add(rx: Register, _ ry: Register, _ rz: Register) {
-        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    private mutating func add(_ rx: Register, _ ry: Register, _ rz: Register) {
+        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(bitPattern: registers[rz])).0
         registers[rx] = UInt16(bitPattern: added)
     }
 
-    private mutating func nand(rx: Register, _ ry: Register, _ rz: Register) {
-        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    private mutating func nand(_ rx: Register, _ ry: Register, _ rz: Register) {
+        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = ~(registers[ry] & registers[rz])
     }
 
-    private mutating func addi(rx: Register, _ ry: Register, offset: Int8) {
-        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    private mutating func addi(_ rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(offset)).0
         registers[rx] = UInt16(bitPattern: added)
     }
 
-    private mutating func lw(rx: Register, _ ry: Register, offset: Int8) {
-        rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
+    private mutating func lw(_ rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(data: RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
         registers[rx] = memory[Int(registers[ry]) + Int(offset)]
     }
 
-    private mutating func sw(rx: Register, _ ry: Register, offset: Int8) {
-        rewindStack.push(RewindInfo(value: memory[Int(registers[ry]) + Int(offset)], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
+    private mutating func sw(_ rx: Register, _ ry: Register, offset: Int8) {
+        rewindStack.push(data: RewindInfo(value: memory[Int(registers[ry]) + Int(offset)], programCounter: currentAddress, memoryAddress: Int(registers[ry]) + Int(offset)))
         memory[Int(registers[ry]) + Int(offset)] = registers[rx]
     }
 
-    private mutating func beq(rx: Register, _ ry: Register, address: UInt16) {
-        rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
+    private mutating func beq(_ rx: Register, _ ry: Register, address: UInt16) {
+        rewindStack.push(data: RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         if registers[rx] == registers[ry] {
             currentAddress = address
         }
     }
 
-    private mutating func jalr(rx: Register, _ ry: Register = .ReturnAddr) {
-        rewindStack.push(RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
+    private mutating func jalr(_ rx: Register, _ ry: Register = .ReturnAddr) {
+        rewindStack.push(data: RewindInfo(value: registers[ry], programCounter: currentAddress, register: ry))
         registers[ry] = currentAddress
         currentAddress = registers[rx]
     }
 
-    private mutating func spop(controlCode: UInt) {
+    private mutating func spop(_ controlCode: UInt) {
         if controlCode == 0 {
             shouldRun = false
         }
     }
 
-    private mutating func executeInstruction(instr: Instruction) {
+    private mutating func executeInstruction(_ instr: Instruction) {
         guard currentAddress != 0xFFFF else {
             shouldRun = false
             return;
@@ -116,8 +116,8 @@ public struct LC2200Processor {
     public mutating func reset() {
         registers = RegisterFile()
         currentAddress = 0
-        memory = [UInt16](count: 64 * 1024, repeatedValue: 0)
-        for (i, v) in originalMemory.enumerate() {
+        memory = [UInt16](repeating: 0, count: 64 * 1024)
+        for (i, v) in originalMemory.enumerated() {
             memory[i] = v
         }
         breakpoints = Set<UInt16>()
@@ -133,7 +133,7 @@ public struct LC2200Processor {
         if shouldRun {
             let instruction = Instruction(value: memory[Int(currentAddress)])
             if printingEnabled {
-                print("0x\(String(currentAddress, radix: 16).uppercaseString):\t\(instruction)")
+                print("0x\(String(currentAddress, radix: 16).uppercased()):\t\(instruction)")
             }
             executeInstruction(instruction)
         } else {
@@ -153,7 +153,7 @@ public struct LC2200Processor {
             }
             let instruction = Instruction(value: memory[Int(currentAddress)])
             if printingEnabled {
-                print("0x\(String(currentAddress, radix: 16).uppercaseString):\t\(instruction)")
+                print("0x\(String(currentAddress, radix: 16).uppercased()):\t\(instruction)")
             }
             return true
         }
@@ -161,17 +161,17 @@ public struct LC2200Processor {
     }
 
     public func stringForCurrentAddress() -> String {
-        return stringForAddress(Int(currentAddress))
+        return stringForAddress(addr: Int(currentAddress))
     }
 
     public func stringForAddress(addr: Int) -> String {
         let v = self.memory[addr]
-        return "0x\(String(addr, radix: 16).uppercaseString):\t\(stringForValue(v))"
+        return "0x\(String(addr, radix: 16).uppercased()):\t\(stringForValue(v))"
     }
 
-    public func stringForValue(v: UInt16) -> String {
+    public func stringForValue(_ v: UInt16) -> String {
         let instr = Instruction(value: v)
-        return "\(v)\t0x\(String(v, radix: 16).uppercaseString)\t\(instr.debugDescription)"
+        return "\(v)\t0x\(String(v, radix: 16).uppercased())\t\(instr.debugDescription)"
     }
 
 }

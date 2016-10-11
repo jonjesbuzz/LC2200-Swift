@@ -8,9 +8,9 @@ extension LC2200Processor {
 
     public func printMemory() {
         print("Mem\tDec\tHex\tInstr")
-        for (i, v) in memory.enumerate() {
+        for (i, v) in memory.enumerated() {
             if v != 0 {
-                print(stringForAddress(i))
+                print(stringForAddress(addr: i))
             }
         }
     }
@@ -23,26 +23,26 @@ public struct CommandLineUI {
     private var arguments: [String]
     public init(arguments: [String]) {
         self.arguments = arguments
-        initializeProcessor()
+        initializeCommandLineor()
     }
 
-    private mutating func initializeProcessor() {
+    private mutating func initializeCommandLineor() {
         if arguments.count == 1 || (arguments.count == 2 && arguments[1] == "--debug") {
             print("Loaded default/compiled program")
-            processor.setupMemory(Program.program)
+            processor.setupMemory(words: Program.program)
         } else if arguments.count >= 2 && arguments[1].hasSuffix(".s") {
             let filename = arguments[1]
             do {
-                let instructions = try String(contentsOfFile: filename, encoding: NSUTF8StringEncoding)
+                let instructions = try String(contentsOfFile: filename, encoding: String.Encoding.utf8)
                 var assembler = LC2200Assembler(source: instructions)
                 print("Assembling \(filename)")
                 let assembled = try assembler.assemble()
                 let str = assembled.reduce("") { "\($0) \(String(format: "%04X", $1))" }
-                let lcFile = "\(filename.substringToIndex(filename.endIndex.predecessor().predecessor())).lc"
+                let lcFile = "\(filename.substring(to: filename.index(filename.endIndex, offsetBy: -2))).lc"
                 print("Writing output to \(lcFile)")
-                try str.writeToFile(lcFile, atomically: true, encoding: NSUTF8StringEncoding)
+                try str.write(toFile: lcFile, atomically: true, encoding: String.Encoding.utf8)
                 print("Loaded \(filename) into memory, via assembler.")
-                processor.setupMemory(assembled)
+                processor.setupMemory(words: assembled)
             } catch AssemblerError.OffsetTooLarge(let offset, let instruction) {
                 print("Offset \(offset) is too large on line \(instruction)")
                 exit(1)
@@ -55,17 +55,17 @@ public struct CommandLineUI {
             }
         } else {
             do {
-                let memory = try String(contentsOfFile: arguments[1], encoding: NSUTF8StringEncoding)
+                let memory = try String(contentsOfFile: arguments[1], encoding: String.Encoding.utf8)
                 let vals = memory.characters.split { $0 == " " || $0 == "\n" }.map(String.init)
                 let things = vals.map { (s) -> (UInt16) in
                     if let data = UInt16(s, radix: 16) {
                         return data
                     }
-                    print("File \(Process.arguments[1]) is not a valid LC2200 file.")
+                    print("File \(CommandLine.arguments[1]) is not a valid LC2200 file.")
                     exit(1)
                 }
-                processor.setupMemory(things)
-                print("Loaded \(Process.arguments[1])")
+                processor.setupMemory(words: things)
+                print("Loaded \(CommandLine.arguments[1])")
             } catch {
                 print(error)
                 exit(1)
@@ -74,7 +74,7 @@ public struct CommandLineUI {
     }
 
     public mutating func start() {
-        if Process.arguments.contains("--debug") {
+        if CommandLine.arguments.contains("--debug") {
             self.runDebugMode()
         } else {
             self.run()
@@ -92,15 +92,15 @@ public struct CommandLineUI {
 
             print("(LC2200) ", separator: "", terminator: "")
 
-            let readCommand = readLine(stripNewline: true)?.lowercaseString
+            let readCommand = readLine(strippingNewline: true)?.lowercased()
 
             // Parse out the argument (used in breakpoint)
-            if let readCommand = readCommand where readCommand != "" {
+            if let readCommand = readCommand, readCommand != "" {
                 let args = readCommand.characters.split { $0 == " " }.map(String.init)
                 command = args[0]
                 commandArg = args.last ?? ""
-                if commandArg.containsString("0x") {
-                    commandArg = commandArg.substringFromIndex(commandArg.startIndex.advancedBy(2))
+                if commandArg.contains("0x") {
+                    commandArg = commandArg.substring(from: commandArg.index(commandArg.startIndex, offsetBy: 2))
                 }
             }
 
@@ -124,7 +124,7 @@ public struct CommandLineUI {
                 processor.printMemory()
             case "break", "br":
                 if let addr = UInt16(commandArg, radix: 16) {
-                    processor.setBreakpoint(addr)
+                    processor.setBreakpoint(location: addr)
                 } else {
                     print("Invalid address: \(commandArg)")
                 }
@@ -141,14 +141,14 @@ public struct CommandLineUI {
                     if i == processor.currentAddress {
                         print("-> ", separator: "", terminator: "")
                     }
-                    print("\t\(processor.stringForAddress(Int(i)))")
+                    print("\t\(processor.stringForAddress(addr: Int(i)))")
                 }
             case "print", "p":
                 if let addr = UInt16(commandArg, radix: 16) {
-                    print(processor.stringForAddress(Int(addr)))
+                    print(processor.stringForAddress(addr: Int(addr)))
                 } else if let register = RegisterFile.Register(symbol: commandArg) {
                     let regValue = processor.registers[register]
-                    print(processor.stringForAddress(Int(regValue)))
+                    print(processor.stringForAddress(addr: Int(regValue)))
                 } else {
                     print("Invalid address/register: \(commandArg)")
                 }
