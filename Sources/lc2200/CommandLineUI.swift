@@ -1,4 +1,5 @@
 import Foundation
+import LC2200Kit
 
 extension LC2200Processor {
 
@@ -38,7 +39,7 @@ public struct CommandLineUI {
                 print("Assembling \(filename)")
                 let assembled = try assembler.assemble()
                 let str = assembled.reduce("") { "\($0) \(String(format: "%04X", $1))" }
-                let lcFile = "\(filename.substring(to: filename.index(filename.endIndex, offsetBy: -2))).lc"
+                let lcFile = String(filename.dropLast(1)).appending("lc")
                 print("Writing output to \(lcFile)")
                 try str.write(toFile: lcFile, atomically: true, encoding: String.Encoding.utf8)
                 print("Loaded \(filename) into memory, via assembler.")
@@ -56,7 +57,7 @@ public struct CommandLineUI {
         } else {
             do {
                 let memory = try String(contentsOfFile: arguments[1], encoding: String.Encoding.utf8)
-                let vals = memory.characters.split { $0 == " " || $0 == "\n" }.map(String.init)
+                let vals = memory.split { $0 == " " || $0 == "\n" }.map(String.init)
                 let things = vals.map { (s) -> (UInt16) in
                     if let data = UInt16(s, radix: 16) {
                         return data
@@ -96,11 +97,11 @@ public struct CommandLineUI {
 
             // Parse out the argument (used in breakpoint)
             if let readCommand = readCommand, readCommand != "" {
-                let args = readCommand.characters.split { $0 == " " }.map(String.init)
+                let args = readCommand.split(separator: " ").map(String.init)
                 command = args[0]
                 commandArg = args.last ?? ""
                 if commandArg.contains("0x") {
-                    commandArg = commandArg.substring(from: commandArg.index(commandArg.startIndex, offsetBy: 2))
+                    commandArg = String(commandArg.dropFirst(2))
                 }
             }
 
@@ -146,9 +147,8 @@ public struct CommandLineUI {
             case "print", "p":
                 if let addr = UInt16(commandArg, radix: 16) {
                     print(processor.stringForAddress(addr: Int(addr)))
-                } else if let register = RegisterFile.Register(symbol: commandArg) {
-                    let regValue = processor.registers[register]
-                    print(processor.stringForAddress(addr: Int(regValue)))
+                } else if let registerValue = processor.registers[commandArg] {
+                    print(processor.stringForAddress(addr: Int(registerValue)))
                 } else {
                     print("Invalid address/register: \(commandArg)")
                 }
@@ -164,7 +164,7 @@ public struct CommandLineUI {
                 print("[b]ack\t\t\tGo back 1 instruction.")
                 print("[l]ist\t\t\tPrint the current memory address, with 5 lines before and after.")
                 print("[p]rint (0xFFFF)\tPrint the memory location.")
-                print("[p]rint ($reg)\tPrint the memory location of the value of a register.")
+                print("[p]rint ($reg)\t\tPrint the memory location of the value of a register.")
                 print("[c]ontinue\t\tResume execution, after stopping/setting a breakpoint.")
                 print("[br]eak (0xFFFF)\tAdd a breakpoint at a memory location.")
                 print("[reg]ister\t\tPrint out the registers.")

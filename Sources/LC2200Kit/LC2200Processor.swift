@@ -24,7 +24,7 @@ public struct LC2200Processor {
 
     fileprivate mutating func add(_ rx: Register, _ ry: Register, _ rz: Register) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
-        let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(bitPattern: registers[rz])).0
+        let added = Int16(bitPattern: registers[ry]).addingReportingOverflow(Int16(bitPattern: registers[rz])).partialValue
         registers[rx] = UInt16(bitPattern: added)
     }
 
@@ -35,7 +35,7 @@ public struct LC2200Processor {
 
     fileprivate mutating func addi(_ rx: Register, _ ry: Register, offset: Int8) {
         rewindStack.push(RewindInfo(value: registers[rx], programCounter: currentAddress, register: rx))
-        let added = Int16.addWithOverflow(Int16(bitPattern: registers[ry]), Int16(offset)).0
+        let added = Int16(bitPattern: registers[ry]).addingReportingOverflow(Int16(offset)).partialValue
         registers[rx] = UInt16(bitPattern: added)
     }
 

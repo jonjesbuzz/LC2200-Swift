@@ -127,6 +127,15 @@ public struct RegisterFile: CustomStringConvertible {
             registers[r] = newValue
         }
     }
+    
+    public subscript(s: String) -> UInt16? {
+        get {
+            if let register = Register(symbol: s) {
+                return registers[Int(register.rawValue)]
+            }
+            return nil
+        }
+    }
 
     public var description: String {
         var answer = ""

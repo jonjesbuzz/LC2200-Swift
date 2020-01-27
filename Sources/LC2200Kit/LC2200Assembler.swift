@@ -17,7 +17,7 @@ public struct LC2200Assembler {
     }
 
     fileprivate func preprocess() -> [String] {
-        return source.characters.split { $0 == "\n" }.map(String.init)
+        return source.split(separator: "\n").map(String.init)
     }
 
     fileprivate mutating func processCommentsAndLabels(_ lines: inout [String]) {
@@ -96,7 +96,7 @@ public struct LC2200Assembler {
                 } else {
                     var num = instr[1]
                     if num.hasPrefix("0x") {
-                        num = num.substring(from: num.index(num.startIndex, offsetBy: 2))
+                        num = String(num.dropFirst(2))
                     }
                     if let addr16 = UInt16(num, radix: 16) {
                         memory.append(addr16)

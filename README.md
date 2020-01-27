@@ -28,7 +28,7 @@ Running the simulator with `--debug` will enable a GDB-like debugger.
 These (probably) need to be written at some point. `:|`
 
 ## Framework
-This simulator can also be compiled as a framework for iOS, macOS, tvOS (LOL), and watchOS (LOLOLOL).  Use [Carthage](https://github.com/Carthage/Carthage) to install the framework into your project.
+This simulator can also be compiled as a framework for iOS, macOS, tvOS (LOL), and watchOS (LOLOLOL).  Use Swift Package Manager or [Carthage](https://github.com/Carthage/Carthage) to install the framework into your project.
 
 ## Documentation
 
